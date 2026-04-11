@@ -10,12 +10,16 @@ export default function Projects() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await addRecord('Projects', {
-            ...formData,
-            date: new Date().toISOString().split('T')[0]
-        });
-        setShowForm(false);
-        setFormData({ title: '', category: 'Wedding', status: 'planned' });
+        try {
+            await addRecord('Projects', {
+                ...formData,
+                date: new Date().toISOString().split('T')[0]
+            });
+            setShowForm(false);
+            setFormData({ title: '', category: 'Wedding', status: 'planned' });
+        } catch (err) {
+            alert('❌ فشل الحفظ: ' + err.message);
+        }
     };
 
     if (loading) return <div>Loading projects...</div>;

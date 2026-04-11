@@ -10,12 +10,16 @@ export default function Wallet() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await addRecord('Transactions', {
-            ...formData,
-            date: new Date().toISOString().split('T')[0],
-        });
-        setShowForm(false);
-        setFormData({ description: '', amount: '', type: 'income' });
+        try {
+            await addRecord('Transactions', {
+                ...formData,
+                date: new Date().toISOString().split('T')[0],
+            });
+            setShowForm(false);
+            setFormData({ description: '', amount: '', type: 'income' });
+        } catch (err) {
+            alert('❌ فشل الحفظ: ' + err.message);
+        }
     };
 
     if (loading) return <div className="animate-pulse">Loading wallet...</div>;

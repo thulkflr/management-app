@@ -10,9 +10,13 @@ export default function Members() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await addRecord('Members', formData);
-        setShowForm(false);
-        setFormData({ name: '', role: '', sharePercentage: '' });
+        try {
+            await addRecord('Members', formData);
+            setShowForm(false);
+            setFormData({ name: '', role: '', sharePercentage: '' });
+        } catch (err) {
+            alert('❌ فشل الحفظ: ' + err.message);
+        }
     };
 
     if (loading) return <div className="animate-pulse">Loading members...</div>;

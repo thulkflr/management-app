@@ -11,6 +11,7 @@ export function AppProvider({ children }) {
         projects: [],
     });
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const loadData = async () => {
         setLoading(true);
@@ -21,13 +22,16 @@ export function AppProvider({ children }) {
                 fetch('/api/data?type=Projects')
             ]);
 
-            setData({
-                members: await membersRes.json(),
-                transactions: await txRes.json(),
-                projects: await projectsRes.json()
-            });
-        } catch (error) {
-            console.error("Failed to load data", error);
+            const [members, transactions, projects] = await Promise.all([
+                membersRes.json(),
+                txRes.json(),
+                projectsRes.json(),
+            ]);
+
+            setData({ members, transactions, projects });
+        } catch (err) {
+            console.error("Failed to load data", err);
+            setError(err.message);
         }
         setLoading(false);
     };
@@ -39,10 +43,15 @@ export function AppProvider({ children }) {
     const addRecord = async (type, payload) => {
         // Generate simple ID
         const newRecord = { ...payload, id: Date.now().toString() };
-        await fetch('/api/data', {
+        const res = await fetch('/api/data', {
             method: 'POST',
-            body: JSON.stringify({ type, payload: newRecord })
+            headers: { 'Content-Type': 'application/json' }, // ← Fix: required for request.json()
+            body: JSON.stringify({ type, payload: newRecord }),
         });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to save ${type}`);
+        }
         // Refresh local state to reflect DB
         await loadData();
     };
