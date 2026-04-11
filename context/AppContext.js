@@ -22,11 +22,17 @@ export function AppProvider({ children }) {
                 fetch('/api/data?type=Projects')
             ]);
 
-            const [members, transactions, projects] = await Promise.all([
+            const [members, transactionsRaw, projects] = await Promise.all([
                 membersRes.json(),
                 txRes.json(),
                 projectsRes.json(),
             ]);
+
+            // Normalize: Handle cases where the spreadsheet header might be 'numberId' instead of 'memberId'
+            const transactions = transactionsRaw.map(tx => ({
+                ...tx,
+                memberId: tx.memberId || tx.numberId // Map both to memberId for app consistency
+            }));
 
             setData({ members, transactions, projects });
         } catch (err) {
@@ -41,8 +47,13 @@ export function AppProvider({ children }) {
     }, []);
 
     const addRecord = async (type, payload) => {
-        // Generate simple ID
-        const newRecord = { ...payload, id: Date.now().toString() };
+        // Generate simple ID and handle memberId/numberId compatibility
+        const newRecord = {
+            ...payload,
+            id: Date.now().toString(),
+            // If it's a transaction, send both just in case the sheet header has a typo
+            ...(payload.memberId ? { numberId: payload.memberId } : {})
+        };
         const res = await fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }, // ← Fix: required for request.json()
