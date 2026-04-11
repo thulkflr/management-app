@@ -72,9 +72,10 @@ export function AppProvider({ children }) {
     const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + Number(curr.amount), 0);
     const totalCapital = data.transactions.filter(t => t.type === 'capital').reduce((acc, curr) => acc + Number(curr.amount), 0);
     const netProfit = totalIncome - totalExpenses;
+    const remainingMoney = totalCapital + netProfit;
 
     return (
-        <AppContext.Provider value={{ data, loading, addRecord, totalIncome, totalExpenses, totalCapital, netProfit }}>
+        <AppContext.Provider value={{ data, loading, addRecord, totalIncome, totalExpenses, totalCapital, netProfit, remainingMoney }}>
             {children}
         </AppContext.Provider>
     );

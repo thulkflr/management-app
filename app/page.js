@@ -3,7 +3,7 @@
 import { useAppContext } from '@/context/AppContext';
 
 export default function Dashboard() {
-    const { data, loading, totalIncome, totalExpenses, totalCapital, netProfit } = useAppContext();
+    const { data, loading, totalIncome, totalExpenses, totalCapital, netProfit, remainingMoney } = useAppContext();
 
     if (loading) return (
         <div className="max-w-5xl mx-auto p-4 space-y-8 animate-pulse">
@@ -23,7 +23,7 @@ export default function Dashboard() {
             </div>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-bl-full group-hover:w-20 group-hover:h-20 transition-all duration-300"></div>
                     <p className="text-xs text-slate-400 font-black uppercase tracking-widest">Revenue</p>
@@ -48,6 +48,15 @@ export default function Dashboard() {
                     <p className="text-3xl font-black text-slate-800 mt-2 tracking-tighter">${totalCapital.toLocaleString()}</p>
                     <div className="mt-2 text-[10px] font-bold text-indigo-600 flex items-center gap-1">
                         <span>● Partner fund</span>
+                    </div>
+                </div>
+
+                <div className="bg-slate-900 p-6 rounded-2xl shadow-xl shadow-slate-200 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full group-hover:w-20 group-hover:h-20 transition-all duration-300"></div>
+                    <p className="text-xs font-black opacity-80 uppercase tracking-widest text-white">Remaining Cash</p>
+                    <p className="text-3xl font-black mt-2 tracking-tighter text-white">${remainingMoney.toLocaleString()}</p>
+                    <div className="mt-2 text-[10px] font-bold flex items-center gap-1 text-white/70">
+                        <span>● Cash on Hand</span>
                     </div>
                 </div>
 
