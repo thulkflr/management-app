@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
         members: [],
         transactions: [],
         projects: [],
+        ideas: [],
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,16 +17,18 @@ export function AppProvider({ children }) {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [membersRes, txRes, projectsRes] = await Promise.all([
+            const [membersRes, txRes, projectsRes, ideasRes] = await Promise.all([
                 fetch('/api/data?type=Members'),
                 fetch('/api/data?type=Transactions'),
-                fetch('/api/data?type=Projects')
+                fetch('/api/data?type=Projects'),
+                fetch('/api/data?type=Ideas')
             ]);
 
-            const [members, transactionsRaw, projects] = await Promise.all([
+            const [members, transactionsRaw, projects, ideas] = await Promise.all([
                 membersRes.json(),
                 txRes.json(),
                 projectsRes.json(),
+                ideasRes.json(),
             ]);
 
             // Normalize: Handle cases where the spreadsheet header might be 'numberId' instead of 'memberId'
@@ -34,7 +37,7 @@ export function AppProvider({ children }) {
                 memberId: tx.memberId || tx.numberId // Map both to memberId for app consistency
             }));
 
-            setData({ members, transactions, projects });
+            setData({ members, transactions, projects, ideas });
         } catch (err) {
             console.error("Failed to load data", err);
             setError(err.message);

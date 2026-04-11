@@ -5,7 +5,8 @@ import './globals.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X } from 'lucide-react';
+
+import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb } from 'lucide-react';
 
 export default function RootLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
         { href: '/projects', label: 'Projects', icon: FolderKanban },
         { href: '/wallet', label: 'Wallet', icon: Wallet },
         { href: '/members', label: 'Members', icon: Users },
+        { href: '/ideas', label: 'Ideas', icon: Lightbulb },
     ];
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -60,8 +62,8 @@ export default function RootLayout({ children }) {
                                         href={item.href}
                                         onClick={closeSidebar}
                                         className={`flex items-center gap-3 p-3 rounded-lg transition group ${isActive
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+                                            ? 'bg-indigo-600 text-white'
+                                            : 'hover:bg-slate-800 text-slate-400 hover:text-white'
                                             }`}
                                     >
                                         <Icon size={20} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'} />
