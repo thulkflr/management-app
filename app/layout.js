@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
                 <AppProvider>
                     {/* Mobile Header */}
                     <header className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-50">
-                        <div className="text-xl font-bold">PhotoBiz</div>
+                        <div className="text-xl font-bold">CAPRICE Management</div>
                         <button onClick={toggleSidebar} className="p-2 hover:bg-slate-800 rounded-lg transition">
                             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
                         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}>
                         <div className="p-6 text-xl font-bold border-b border-brand-gold/10 hidden md:block text-center text-brand-gold tracking-widest uppercase">
-                            PhotoBiz
+                            CAPRICE Management
                         </div>
                         <nav className="flex-1 p-4 space-y-2 mt-4 md:mt-0">
                             {navItems.map((item) => {
@@ -73,7 +73,7 @@ export default function RootLayout({ children }) {
                             })}
                         </nav>
                         <div className="p-4 border-t border-brand-gold/10 text-center text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                            © 2026 PhotoBiz Manager
+                            © 2026 CAPRICE Manager
                         </div>
                     </aside>
 
