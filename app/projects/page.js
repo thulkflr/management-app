@@ -65,7 +65,7 @@ export default function Projects() {
                             <p className="text-sm text-slate-500">{project.category} • {project.date}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium uppercase ${project.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
-                                project.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'
+                            project.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'
                             }`}>
                             {project.status.replace('_', ' ')}
                         </span>
