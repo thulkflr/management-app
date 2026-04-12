@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
     const closeSidebar = () => setIsSidebarOpen(false);
 
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className="bg-slate-50 text-slate-900 h-screen overflow-hidden flex flex-col md:flex-row">
                 <AppProvider>
                     {/* Mobile Header */}

@@ -82,6 +82,7 @@ export default function Projects() {
                     onClick={() => {
                         setShowForm(!showForm);
                         setFormData(INITIAL_FORM_DATA);
+                        setModalConfig({ isOpen: false, type: null, data: null });
                     }}
                     className="w-full sm:w-auto bg-brand-gold text-black px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
                 >
@@ -133,6 +134,9 @@ export default function Projects() {
                                 className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold"
                             >
                                 <option>Event</option>
+                                <option>School Graduation</option>
+                                <option>University Graduation</option>
+                                <option>Family</option>
                                 <option>Portrait</option>
                                 <option>Commercial</option>
                                 <option>Wedding</option>
@@ -272,6 +276,9 @@ export default function Projects() {
                                     className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold"
                                 >
                                     <option>Event</option>
+                                    <option>School Graduation</option>
+                                    <option>University Graduation</option>
+                                    <option>Family</option>
                                     <option>Portrait</option>
                                     <option>Commercial</option>
                                     <option>Wedding</option>

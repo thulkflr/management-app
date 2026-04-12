@@ -84,6 +84,7 @@ export default function Ideas() {
                     onClick={() => {
                         setShowForm(!showForm);
                         setFormData(INITIAL_FORM_DATA);
+                        setModalConfig({ isOpen: false, type: null, data: null });
                     }}
                     className="w-full sm:w-auto bg-brand-gold text-black px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                 >

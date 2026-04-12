@@ -70,6 +70,7 @@ export default function Members() {
                     onClick={() => {
                         setShowForm(!showForm);
                         setFormData({ name: '', role: '', sharePercentage: '' });
+                        setModalConfig({ isOpen: false, type: null, data: null });
                     }}
                     className="w-full sm:w-auto bg-brand-gold text-black px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
                 >
