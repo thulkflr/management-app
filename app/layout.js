@@ -28,10 +28,15 @@ export default function RootLayout({ children }) {
             <body className="bg-slate-50 text-slate-900 h-screen overflow-hidden flex flex-col md:flex-row">
                 <AppProvider>
                     {/* Mobile Header */}
-                    <header className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-50">
-                        <div className="text-xl font-bold">CAPRICE Management</div>
-                        <button onClick={toggleSidebar} className="p-2 hover:bg-slate-800 rounded-lg transition">
-                            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+                    <header className="md:hidden bg-black text-white p-4 flex justify-between items-center z-50 border-b border-brand-gold/20 backdrop-blur-md bg-black/90 sticky top-0">
+                        <div className="text-lg font-black text-brand-gold tracking-tighter uppercase italic">
+                            CAPRICE <span className="text-white opacity-50 font-light">MGMT</span>
+                        </div>
+                        <button
+                            onClick={toggleSidebar}
+                            className="p-2.5 bg-brand-gold/10 text-brand-gold rounded-xl border border-brand-gold/20 hover:bg-brand-gold hover:text-black transition-all active:scale-90"
+                        >
+                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                     </header>
 
