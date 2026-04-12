@@ -38,21 +38,26 @@ export default function RootLayout({ children }) {
                     {/* Overlay for mobile */}
                     {isSidebarOpen && (
                         <div
-                            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden animate-in fade-in duration-300"
                             onClick={closeSidebar}
                         />
                     )}
 
                     {/* Sidebar */}
                     <aside className={`
-                        fixed inset-y-0 left-0 z-45 w-64 bg-black text-white flex flex-col transition-transform duration-300 ease-in-out
+                        fixed inset-y-0 left-0 z-[60] w-72 bg-black text-white flex flex-col transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1)
                         md:relative md:translate-x-0 border-r border-brand-gold/10
-                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                        ${isSidebarOpen ? 'translate-x-0 shadow-2xl shadow-black' : '-translate-x-full'}
                     `}>
-                        <div className="p-6 text-xl font-bold border-b border-brand-gold/10 hidden md:block text-center text-brand-gold tracking-widest uppercase">
-                            CAPRICE Management
+                        <div className="p-6 border-b border-brand-gold/10 flex items-center justify-between">
+                            <div className="text-lg font-black text-brand-gold tracking-tighter uppercase italic">
+                                CAPRICE <span className="text-white opacity-50 font-light">MGMT</span>
+                            </div>
+                            <button onClick={closeSidebar} className="md:hidden p-2 text-white/40 hover:text-brand-gold transition-colors">
+                                <X size={20} />
+                            </button>
                         </div>
-                        <nav className="flex-1 p-4 space-y-2 mt-4 md:mt-0">
+                        <nav className="flex-1 p-4 space-y-1.5 mt-2">
                             {navItems.map((item) => {
                                 const Icon = item.icon;
                                 const isActive = pathname === item.href;
@@ -61,24 +66,24 @@ export default function RootLayout({ children }) {
                                         key={item.href}
                                         href={item.href}
                                         onClick={closeSidebar}
-                                        className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group ${isActive
-                                            ? 'bg-brand-gold text-black shadow-lg shadow-brand-gold/20'
-                                            : 'text-slate-400 hover:bg-brand-gold/10 hover:text-brand-gold'
+                                        className={`flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 group ${isActive
+                                            ? 'bg-brand-gold text-black shadow-lg shadow-brand-gold/20 scale-[1.02]'
+                                            : 'text-slate-400 hover:bg-brand-gold/5 hover:text-brand-gold'
                                             }`}
                                     >
-                                        <Icon size={20} className={isActive ? 'text-black' : 'text-slate-400 group-hover:text-brand-gold'} />
-                                        <span className="font-bold tracking-wide">{item.label}</span>
+                                        <Icon size={18} className={isActive ? 'text-black' : 'text-slate-500 group-hover:text-brand-gold transition-colors'} />
+                                        <span className="font-bold text-sm tracking-tight">{item.label}</span>
                                     </Link>
                                 );
                             })}
                         </nav>
-                        <div className="p-4 border-t border-brand-gold/10 text-center text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                            © 2026 CAPRICE Manager
+                        <div className="p-6 border-t border-brand-gold/10 text-center">
+                            <p className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em]">© 2026 CAPRICE</p>
                         </div>
                     </aside>
 
                     {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto p-4 md:p-8 relative">
+                    <main className="flex-1 overflow-y-auto p-4 md:p-8 relative pb-32 md:pb-8">
                         {children}
                     </main>
                 </AppProvider>

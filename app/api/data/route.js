@@ -1,6 +1,6 @@
 // app/api/data/route.js
 import { NextResponse } from 'next/server';
-import { getSheetData, addRowToSheet, deleteRowFromSheet } from '@/lib/googleSheets';
+import { getSheetData, addRowToSheet, deleteRowFromSheet, updateRowInSheet } from '@/lib/googleSheets';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -18,6 +18,16 @@ export async function POST(request) {
     try {
         const { type, payload } = await request.json();
         const result = await addRowToSheet(type, payload);
+        return NextResponse.json(result);
+    } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function PATCH(request) {
+    try {
+        const { type, id, payload } = await request.json();
+        const result = await updateRowInSheet(type, id, payload);
         return NextResponse.json(result);
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

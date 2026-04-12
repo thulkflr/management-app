@@ -50,23 +50,46 @@ export function AppProvider({ children }) {
     }, []);
 
     const addRecord = async (type, payload) => {
-        // Generate simple ID and handle memberId/numberId compatibility
         const newRecord = {
             ...payload,
             id: Date.now().toString(),
-            // If it's a transaction, send both just in case the sheet header has a typo
             ...(payload.memberId ? { numberId: payload.memberId } : {})
         };
         const res = await fetch('/api/data', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }, // ← Fix: required for request.json()
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, payload: newRecord }),
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.error || `Failed to save ${type}`);
         }
-        // Refresh local state to reflect DB
+        await loadData();
+    };
+
+    const updateRecord = async (type, id, payload) => {
+        const res = await fetch('/api/data', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, id, payload }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to update ${type}`);
+        }
+        await loadData();
+    };
+
+    const deleteRecord = async (type, id) => {
+        const res = await fetch('/api/data', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, id }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to delete ${type}`);
+        }
         await loadData();
     };
 
@@ -78,7 +101,18 @@ export function AppProvider({ children }) {
     const remainingMoney = totalCapital + netProfit;
 
     return (
-        <AppContext.Provider value={{ data, loading, addRecord, totalIncome, totalExpenses, totalCapital, netProfit, remainingMoney }}>
+        <AppContext.Provider value={{
+            data,
+            loading,
+            addRecord,
+            updateRecord,
+            deleteRecord,
+            totalIncome,
+            totalExpenses,
+            totalCapital,
+            netProfit,
+            remainingMoney
+        }}>
             {children}
         </AppContext.Provider>
     );
