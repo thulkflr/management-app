@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb, ListChecks } from 'lucide-react';
 
 export default function RootLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,6 +18,7 @@ export default function RootLayout({ children }) {
         { href: '/wallet', label: 'Wallet', icon: Wallet },
         { href: '/members', label: 'Members', icon: Users },
         { href: '/ideas', label: 'Ideas', icon: Lightbulb },
+        { href: '/checklist', label: 'Checklist', icon: ListChecks },
     ];
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);

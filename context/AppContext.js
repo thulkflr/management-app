@@ -10,25 +10,28 @@ export function AppProvider({ children }) {
         transactions: [],
         projects: [],
         ideas: [],
+        checklist: [],
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [, setError] = useState(null);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const [membersRes, txRes, projectsRes, ideasRes] = await Promise.all([
+            const [membersRes, txRes, projectsRes, ideasRes, checklistRes] = await Promise.all([
                 fetch('/api/data?type=Members'),
                 fetch('/api/data?type=Transactions'),
                 fetch('/api/data?type=Projects'),
-                fetch('/api/data?type=Ideas')
+                fetch('/api/data?type=Ideas'),
+                fetch('/api/data?type=Checklist'),
             ]);
 
-            const [members, transactionsRaw, projects, ideas] = await Promise.all([
+            const [members, transactionsRaw, projects, ideas, checklist] = await Promise.all([
                 membersRes.json(),
                 txRes.json(),
                 projectsRes.json(),
                 ideasRes.json(),
+                checklistRes.json(),
             ]);
 
             // Normalize: Handle cases where the spreadsheet header might be 'numberId' instead of 'memberId'
@@ -37,7 +40,7 @@ export function AppProvider({ children }) {
                 memberId: tx.memberId || tx.numberId // Map both to memberId for app consistency
             }));
 
-            setData({ members, transactions, projects, ideas });
+            setData({ members, transactions, projects, ideas, checklist });
         } catch (err) {
             console.error("Failed to load data", err);
             setError(err.message);
@@ -46,15 +49,37 @@ export function AppProvider({ children }) {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadData();
     }, []);
 
-    const addRecord = async (type, payload) => {
+    const getKeyForType = (type) => {
+        switch (type) {
+            case 'Members': return 'members';
+            case 'Transactions': return 'transactions';
+            case 'Projects': return 'projects';
+            case 'Ideas': return 'ideas';
+            case 'Checklist': return 'checklist';
+            default: return null;
+        }
+    };
+
+    const addRecord = async (type, payload, options = {}) => {
+        const { reload = true, optimistic = false } = options;
         const newRecord = {
             ...payload,
             id: Date.now().toString(),
             ...(payload.memberId ? { numberId: payload.memberId } : {})
         };
+
+        const key = getKeyForType(type);
+        if (optimistic && key) {
+            setData(prev => ({
+                ...prev,
+                [key]: [...(Array.isArray(prev[key]) ? prev[key] : []), newRecord],
+            }));
+        }
+
         const res = await fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -62,12 +87,31 @@ export function AppProvider({ children }) {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
+            if (optimistic && key) {
+                setData(prev => ({
+                    ...prev,
+                    [key]: (Array.isArray(prev[key]) ? prev[key] : []).filter(r => r.id !== newRecord.id),
+                }));
+            }
             throw new Error(err.error || `Failed to save ${type}`);
         }
-        await loadData();
+        if (reload) await loadData();
     };
 
-    const updateRecord = async (type, id, payload) => {
+    const updateRecord = async (type, id, payload, options = {}) => {
+        const { reload = true, optimistic = false } = options;
+        const key = getKeyForType(type);
+
+        if (optimistic && key) {
+            setData(prev => {
+                const list = Array.isArray(prev[key]) ? prev[key] : [];
+                return {
+                    ...prev,
+                    [key]: list.map(r => (r.id === id ? { ...r, ...payload } : r)),
+                };
+            });
+        }
+
         const res = await fetch('/api/data', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -75,12 +119,26 @@ export function AppProvider({ children }) {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
+            if (optimistic && key) {
+                // fallback: refetch to guarantee correctness
+                await loadData();
+            }
             throw new Error(err.error || `Failed to update ${type}`);
         }
-        await loadData();
+        if (reload) await loadData();
     };
 
-    const deleteRecord = async (type, id) => {
+    const deleteRecord = async (type, id, options = {}) => {
+        const { reload = true, optimistic = false } = options;
+        const key = getKeyForType(type);
+
+        if (optimistic && key) {
+            setData(prev => ({
+                ...prev,
+                [key]: (Array.isArray(prev[key]) ? prev[key] : []).filter(r => r.id !== id),
+            }));
+        }
+
         const res = await fetch('/api/data', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
@@ -88,9 +146,12 @@ export function AppProvider({ children }) {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
+            if (optimistic && key) {
+                await loadData();
+            }
             throw new Error(err.error || `Failed to delete ${type}`);
         }
-        await loadData();
+        if (reload) await loadData();
     };
 
     // Financial Computations

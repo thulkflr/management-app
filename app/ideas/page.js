@@ -236,7 +236,7 @@ export default function Ideas() {
 
                                 {idea.description && (
                                     <p className="text-xs text-foreground/50 leading-relaxed font-medium line-clamp-2 italic opacity-60">
-                                        "{idea.description}"
+                                        &quot;{idea.description}&quot;
                                     </p>
                                 )}
 
@@ -380,7 +380,7 @@ export default function Ideas() {
                             <div className="space-y-3">
                                 <p className="text-xs font-black text-foreground/30 uppercase tracking-[0.2em]">Detailed Vision</p>
                                 <p className="text-foreground/70 leading-relaxed text-lg font-medium bg-white/5 p-6 rounded-3xl border border-card-border italic">
-                                    "{modalConfig.data.description}"
+                                    &quot;{modalConfig.data.description}&quot;
                                 </p>
                             </div>
                         )}

@@ -341,7 +341,7 @@ export default function Projects() {
                             <div className="space-y-2">
                                 <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em]">Scope/Description</p>
                                 <p className="text-sm font-medium text-foreground/70 leading-relaxed bg-white/5 p-4 rounded-2xl border border-card-border italic">
-                                    "{modalConfig.data.description}"
+                                    &quot;{modalConfig.data.description}&quot;
                                 </p>
                             </div>
                         )}
