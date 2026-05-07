@@ -11,9 +11,15 @@ export default function Wallet() {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ description: '', amount: '', type: 'income', memberId: '', date: new Date().toISOString().split('T')[0] });
     const [isSaving, setIsSaving] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 20;
 
     // Modal state
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+
+    const sortedTransactions = [...data.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const totalPages = Math.max(1, Math.ceil(sortedTransactions.length / PAGE_SIZE));
+    const paginatedTransactions = sortedTransactions.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,7 +32,8 @@ export default function Wallet() {
                 await addRecord('Transactions', {
                     ...formData,
                     date: formData.date || new Date().toISOString().split('T')[0],
-                });
+                }, { reload: false, optimistic: true });
+                setCurrentPage(1);
             }
             setShowForm(false);
             setFormData({ description: '', amount: '', type: 'income', memberId: '', date: new Date().toISOString().split('T')[0] });
@@ -183,10 +190,10 @@ export default function Wallet() {
 
             {/* Mobile View: Cards */}
             <div className="md:hidden space-y-4">
-                {data.transactions.length === 0 ? (
+                {sortedTransactions.length === 0 ? (
                     <div className="text-center p-12 bg-card-bg rounded-2xl border border-card-border text-foreground/40 italic">No history found</div>
                 ) : (
-                    data.transactions.map(tx => {
+                    paginatedTransactions.map(tx => {
                         const member = data.members.find(m => m.id === tx.memberId);
                         return (
                             <div key={tx.id} className="bg-card-bg p-5 rounded-2xl shadow-sm border border-card-border space-y-3 relative group">
@@ -237,7 +244,7 @@ export default function Wallet() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-card-border">
-                        {data.transactions.map(tx => {
+                        {paginatedTransactions.map(tx => {
                             const member = data.members.find(m => m.id === tx.memberId);
                             return (
                                 <tr key={tx.id} className="hover:bg-background/50 transition-colors group">
@@ -270,6 +277,30 @@ export default function Wallet() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between px-1">
+                    <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 rounded-xl border border-card-border text-sm font-semibold text-foreground/70 hover:bg-card-bg transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                        ← Previous
+                    </button>
+                    <span className="text-sm text-foreground/50 font-medium">
+                        Page {currentPage} of {totalPages}
+                        <span className="ml-2 text-foreground/30">({sortedTransactions.length} total)</span>
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 rounded-xl border border-card-border text-sm font-semibold text-foreground/70 hover:bg-card-bg transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                        Next →
+                    </button>
+                </div>
+            )}
 
             {/* Modals */}
             <AppModal

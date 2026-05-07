@@ -68,7 +68,7 @@ export function AppProvider({ children }) {
         const { reload = true, optimistic = false } = options;
         const newRecord = {
             ...payload,
-            id: Date.now().toString(),
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             ...(payload.memberId ? { numberId: payload.memberId } : {})
         };
 
