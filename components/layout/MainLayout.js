@@ -44,7 +44,7 @@ export default function MainLayout({ children }) {
     return (
         <AppProvider>
             <TasksProvider>
-                <div className="bg-slate-50 text-slate-900 h-screen overflow-hidden flex flex-col md:flex-row">
+                <div className="bg-background text-foreground h-screen overflow-hidden flex flex-col md:flex-row">
                     {/* Mobile Header */}
                     <header className="md:hidden bg-black text-white p-4 flex justify-between items-center z-50 border-b border-brand-gold/20 backdrop-blur-md bg-black/90 sticky top-0">
                         <div className="flex items-center gap-3">

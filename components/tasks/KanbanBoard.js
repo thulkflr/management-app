@@ -53,55 +53,57 @@ export default function KanbanBoard() {
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
             {/* Board Header */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 px-4 md:px-0">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">
+                    <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight mb-1">
                         Task <span className="text-brand-gold italic">Board</span>
                     </h1>
-                    <p className="text-slate-500 font-medium text-sm">Manage your production workflow and photography sessions.</p>
+                    <p className="text-text-muted font-medium text-xs md:text-sm">Manage your production workflow and photography sessions.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-gold transition-colors" size={18} />
+                <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                    <div className="relative group flex-1 md:flex-none">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-gold transition-colors" size={16} />
                         <input 
                             type="text" 
                             placeholder="Search tasks..." 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-6 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all w-64"
+                            className="bg-accent-slate border border-card-border rounded-xl md:rounded-2xl py-2.5 md:py-3 pl-10 md:pl-12 pr-4 md:pr-6 text-xs md:text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all w-full md:w-64 shadow-sm"
                         />
                     </div>
                     <button 
                         onClick={() => setIsSettingsOpen(true)}
-                        className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:text-brand-gold hover:border-brand-gold/50 transition-all shadow-sm active:scale-90"
+                        className="p-2.5 md:p-3 bg-accent-slate border border-card-border rounded-xl md:rounded-2xl text-text-muted hover:text-brand-gold hover:border-brand-gold/50 transition-all shadow-sm active:scale-90"
                     >
-                        <Settings size={20} />
+                        <Settings size={18} />
                     </button>
                     <button 
                         onClick={() => handleAddTask()}
-                        className="flex items-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="flex items-center justify-center gap-2 bg-brand-gold text-black px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all flex-1 md:flex-none"
                     >
-                        <Plus size={18} />
-                        New Task
+                        <Plus size={16} />
+                        <span className="hidden xs:inline">New Task</span>
+                        <span className="xs:hidden">Task</span>
                     </button>
                 </div>
             </div>
 
             {/* Kanban Columns */}
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex-1 overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                    <div className="flex gap-6 h-full min-h-[500px]">
+                <div className="flex-1 overflow-x-auto pb-6 md:pb-8 flex snap-x snap-mandatory scrollbar-hide md:scrollbar-default">
+                    <div className="flex gap-4 md:gap-6 px-4 md:px-0 min-w-max md:min-w-0 md:flex-1 h-full min-h-[500px]">
                         {columns.map(column => (
-                            <KanbanColumn 
-                                key={column.id} 
-                                column={column} 
-                                tasks={filteredTasks.filter(t => t.status === column.id)}
-                                onAddTask={handleAddTask}
-                                onTaskClick={handleTaskClick}
-                            />
+                            <div key={column.id} className="snap-center">
+                                <KanbanColumn 
+                                    column={column} 
+                                    tasks={filteredTasks.filter(t => t.status === column.id)}
+                                    onAddTask={handleAddTask}
+                                    onTaskClick={handleTaskClick}
+                                />
+                            </div>
                         ))}
                     </div>
                 </div>

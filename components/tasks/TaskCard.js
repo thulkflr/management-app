@@ -12,52 +12,52 @@ export default function TaskCard({ task, onClick }) {
     return (
         <div
             onClick={() => onClick(task)}
-            className="group bg-white/80 backdrop-blur-md border border-slate-200 p-4 rounded-2xl shadow-sm hover:shadow-xl hover:border-brand-gold/50 transition-all duration-300 cursor-pointer active:scale-95 mb-3"
+            className="group bg-card-bg/80 backdrop-blur-md border border-card-border p-4 rounded-3xl shadow-sm hover:shadow-xl hover:border-brand-gold/50 transition-all duration-300 cursor-pointer active:scale-95 mb-3"
         >
             <div className="flex justify-between items-start mb-3">
-                <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${priority.bg} ${priority.color}`}>
+                <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${priority.bg} ${priority.color} shadow-sm`}>
                     {priority.label}
                 </span>
-                <span className="text-slate-400 group-hover:text-brand-gold transition-colors">
+                <span className="text-text-muted group-hover:text-brand-gold transition-colors">
                     <Clock size={14} />
                 </span>
             </div>
 
-            <h4 className="font-bold text-slate-800 mb-1 line-clamp-2 leading-snug group-hover:text-brand-gold transition-colors">
+            <h4 className="font-bold text-foreground mb-1 line-clamp-2 leading-snug group-hover:text-brand-gold transition-colors tracking-tight">
                 {task.title}
             </h4>
             
-            <p className="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-text-muted mb-4 line-clamp-2 leading-relaxed font-medium opacity-80">
                 {task.description}
             </p>
 
             <div className="flex flex-wrap gap-2 mb-4">
-                <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600">
-                    <span className="text-slate-400 group-hover:text-brand-gold transition-colors">⚡</span>
+                <div className="flex items-center gap-1.5 bg-accent-slate/80 px-2.5 py-1 rounded-xl text-[10px] font-black text-text-muted uppercase tracking-tighter border border-card-border">
+                    <span className="text-brand-gold">⚡</span>
                     {taskType.label}
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-2">
-                <div className="flex items-center gap-2 text-slate-500">
-                    <div className="w-6 h-6 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold border border-brand-gold/10">
+            <div className="flex items-center justify-between pt-3 border-t border-card-border mt-2">
+                <div className="flex items-center gap-2 text-text-muted">
+                    <div className="w-6 h-6 rounded-lg bg-brand-gold/10 flex items-center justify-center text-brand-gold border border-brand-gold/20 shadow-inner overflow-hidden">
                         <User size={12} />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-700 truncate max-w-[80px]">
+                    <span className="text-[10px] font-black text-foreground/80 truncate max-w-[80px] uppercase tracking-tighter">
                         {task.assignee || 'Unassigned'}
                     </span>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-3">
                   {task.dueDate && (
-                    <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
-                        <Calendar size={12} />
+                    <div className="flex items-center gap-1 text-text-muted text-[10px] font-bold">
+                        <Calendar size={12} className="opacity-40" />
                         {format(new Date(task.dueDate), 'MMM d')}
                     </div>
                   )}
                   {task.commentCount > 0 && (
-                    <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
-                        <MessageSquare size={12} />
+                    <div className="flex items-center gap-1 text-text-muted text-[10px] font-bold">
+                        <MessageSquare size={12} className="opacity-40" />
                         {task.commentCount}
                     </div>
                   )}
