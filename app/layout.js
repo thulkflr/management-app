@@ -1,12 +1,13 @@
 // app/layout.js
 'use client';
 import { AppProvider } from '@/context/AppContext';
+import { TasksProvider } from '@/context/TasksContext';
 import './globals.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb, ListChecks } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb, ListChecks, LayoutList } from 'lucide-react';
 
 export default function RootLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
 
     const navItems = [
         { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/tasks', label: 'Tasks', icon: LayoutList },
         { href: '/projects', label: 'Projects', icon: FolderKanban },
         { href: '/wallet', label: 'Wallet', icon: Wallet },
         { href: '/members', label: 'Members', icon: Users },
@@ -26,8 +28,9 @@ export default function RootLayout({ children }) {
 
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className="bg-slate-50 text-slate-900 h-screen overflow-hidden flex flex-col md:flex-row">
+            <body className="bg-slate-50 text-slate-900 h-screen overflow-hidden flex flex-col md:flex-row" suppressHydrationWarning>
                 <AppProvider>
+                    <TasksProvider>
                     {/* Mobile Header */}
                     <header className="md:hidden bg-black text-white p-4 flex justify-between items-center z-50 border-b border-brand-gold/20 backdrop-blur-md bg-black/90 sticky top-0">
                         <div className="text-lg font-black text-brand-gold tracking-tighter uppercase italic">
@@ -92,6 +95,7 @@ export default function RootLayout({ children }) {
                     <main className="flex-1 overflow-y-auto p-4 md:p-8 relative pb-32 md:pb-8">
                         {children}
                     </main>
+                    </TasksProvider>
                 </AppProvider>
             </body>
         </html>
