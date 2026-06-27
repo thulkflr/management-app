@@ -1,10 +1,12 @@
 // context/AppContext.js
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+    const { data: session, status } = useSession();
     const [data, setData] = useState({
         members: [],
         transactions: [],
@@ -16,6 +18,7 @@ export function AppProvider({ children }) {
     const [, setError] = useState(null);
 
     const loadData = async () => {
+        if (status !== 'authenticated') return;
         setLoading(true);
         try {
             const [membersRes, txRes, projectsRes, ideasRes, checklistRes] = await Promise.all([
@@ -49,9 +52,13 @@ export function AppProvider({ children }) {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        loadData();
-    }, []);
+        if (status === 'authenticated') {
+            loadData();
+        } else if (status === 'unauthenticated') {
+            setData({ members: [], transactions: [], projects: [], ideas: [], checklist: [] });
+            setLoading(false);
+        }
+    }, [status]);
 
     const getKeyForType = (type) => {
         switch (type) {

@@ -3,16 +3,19 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { tasksService } from '@/services/tasksService';
+import { useSession } from 'next-auth/react';
 
 const TasksContext = createContext();
 
 export function TasksProvider({ children }) {
+    const { status } = useSession();
     const [tasks, setTasks] = useState([]);
     const [columns, setColumns] = useState([]);
     const [comments, setComments] = useState({}); // Keyed by taskId
     const [loading, setLoading] = useState(true);
 
     const loadData = async () => {
+        if (status !== 'authenticated') return;
         setLoading(true);
         try {
             const [tasksData, columnsData] = await Promise.all([
@@ -36,8 +39,14 @@ export function TasksProvider({ children }) {
     };
 
     useEffect(() => {
-        loadData();
-    }, []);
+        if (status === 'authenticated') {
+            loadData();
+        } else if (status === 'unauthenticated') {
+            setTasks([]);
+            setComments({});
+            setLoading(false);
+        }
+    }, [status]);
 
     // Column Management
     const addColumn = async (column) => {
