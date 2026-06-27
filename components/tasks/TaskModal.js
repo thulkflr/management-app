@@ -58,14 +58,14 @@ export default function TaskModal({ task, onClose }) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             
-            <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="relative bg-background w-full max-w-4xl max-h-[90vh] rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border border-card-border">
                 {/* Modal Header */}
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="p-4 md:p-6 border-b border-card-border flex items-center justify-between bg-accent-slate/30">
                     <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-xl border ${isNew ? 'bg-brand-gold/10 border-brand-gold/20 text-brand-gold' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                        <div className={`p-2 rounded-xl border ${isNew ? 'bg-brand-gold/10 border-brand-gold/20 text-brand-gold' : 'bg-accent-slate border-card-border text-text-muted'}`}>
                             <Tag size={20} />
                         </div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                        <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight">
                             {isNew ? 'Create New Task' : 'Task Details'}
                         </h2>
                     </div>
@@ -73,14 +73,14 @@ export default function TaskModal({ task, onClose }) {
                         {!isNew && (
                             <button 
                                 onClick={handleDelete}
-                                className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                className="p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                             >
                                 <Trash2 size={20} />
                             </button>
                         )}
                         <button 
                             onClick={onClose}
-                            className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                            className="p-2 text-text-muted hover:text-foreground hover:bg-accent-slate rounded-xl transition-all"
                         >
                             <X size={20} />
                         </button>
@@ -89,22 +89,22 @@ export default function TaskModal({ task, onClose }) {
 
                 <div className="flex-1 overflow-y-auto flex flex-col md:flex-row">
                     {/* Main Content Area */}
-                    <div className="flex-1 p-8 border-r border-slate-100">
+                    <div className="flex-1 p-5 md:p-8 border-r border-card-border">
                         <form id="task-form" onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Task Title</label>
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1">Task Title</label>
                                 <input 
                                     required
                                     type="text" 
                                     value={formData.title}
                                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                                     placeholder="What needs to be done?"
-                                    className="w-full text-2xl font-bold text-slate-900 placeholder:text-slate-300 border-none p-0 focus:ring-0"
+                                    className="w-full text-xl md:text-2xl font-bold text-foreground placeholder:text-text-muted/30 bg-transparent border-none p-0 focus:ring-0"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1 flex items-center gap-2">
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1 flex items-center gap-2">
                                     <AlignLeft size={12} /> Description
                                 </label>
                                 <textarea 
@@ -112,7 +112,7 @@ export default function TaskModal({ task, onClose }) {
                                     value={formData.description}
                                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                                     placeholder="Add more details about this task..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all"
+                                    className="w-full bg-accent-slate/50 border border-card-border rounded-2xl p-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all"
                                 />
                             </div>
                         </form>
@@ -121,15 +121,15 @@ export default function TaskModal({ task, onClose }) {
                     </div>
 
                     {/* Sidebar Area */}
-                    <div className="w-full md:w-80 bg-slate-50/50 p-8 space-y-8">
+                    <div className="w-full md:w-80 bg-accent-slate/20 p-5 md:p-8 space-y-6 md:space-y-8">
                         <div>
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                            <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-3 flex items-center gap-2">
                                 <Tag size={12} /> Status
                             </label>
                             <select 
                                 value={formData.status}
                                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                                className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
+                                className="w-full bg-accent-slate border border-card-border rounded-xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
                             >
                                 {columns.map(s => (
                                     <option key={s.id} value={s.id}>{s.label}</option>
@@ -137,15 +137,15 @@ export default function TaskModal({ task, onClose }) {
                             </select>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-6">
+                        <div className="grid grid-cols-1 gap-5 md:gap-6">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-3 flex items-center gap-2">
                                     <Clock size={12} /> Task Type
                                 </label>
                                 <select 
                                     value={formData.type}
                                     onChange={(e) => setFormData({...formData, type: e.target.value})}
-                                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
+                                    className="w-full bg-accent-slate border border-card-border rounded-xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
                                 >
                                     {TASK_TYPES.map(t => (
                                         <option key={t.id} value={t.id}>{t.label}</option>
@@ -154,13 +154,13 @@ export default function TaskModal({ task, onClose }) {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-3 flex items-center gap-2">
                                     <Flag size={12} /> Priority
                                 </label>
                                 <select 
                                     value={formData.priority}
                                     onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
+                                    className="w-full bg-accent-slate border border-card-border rounded-xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
                                 >
                                     {Object.values(TASK_PRIORITIES).map(p => (
                                         <option key={p.id} value={p.id}>{p.label}</option>
@@ -169,13 +169,13 @@ export default function TaskModal({ task, onClose }) {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-3 flex items-center gap-2">
                                     <User size={12} /> Assignee
                                 </label>
                                 <select 
                                     value={formData.assignee}
                                     onChange={(e) => setFormData({...formData, assignee: e.target.value})}
-                                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
+                                    className="w-full bg-accent-slate border border-card-border rounded-xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
                                 >
                                     <option value="">Unassigned</option>
                                     {members.map(m => (
@@ -185,39 +185,39 @@ export default function TaskModal({ task, onClose }) {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-3 flex items-center gap-2">
                                     <Calendar size={12} /> Due Date
                                 </label>
                                 <input 
                                     type="date" 
                                     value={formData.dueDate}
                                     onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
+                                    className="w-full bg-accent-slate border border-card-border rounded-xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 transition-all cursor-pointer"
                                 />
                             </div>
                         </div>
 
                         {!isNew && (
-                            <div className="pt-4 border-t border-slate-200">
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Created At</p>
-                                <p className="text-xs text-slate-600 font-bold">{task.createdAt ? format(new Date(task.createdAt), 'PPP p') : '-'}</p>
+                            <div className="pt-4 border-t border-card-border">
+                                <p className="text-[9px] md:text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1">Created At</p>
+                                <p className="text-xs text-foreground font-bold">{task.createdAt ? format(new Date(task.createdAt), 'PPP p') : '-'}</p>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Footer Actions */}
-                <div className="p-6 border-t border-slate-100 bg-white flex justify-end gap-3">
+                <div className="p-4 md:p-6 border-t border-card-border bg-accent-slate/30 flex justify-end gap-3">
                     <button 
                         onClick={onClose}
-                        className="px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-all"
+                        className="px-6 py-2 md:py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest text-text-muted hover:text-foreground transition-all"
                     >
                         Cancel
                     </button>
                     <button 
                         form="task-form"
                         disabled={isSaving}
-                        className="flex items-center gap-2 bg-brand-gold text-black px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
+                        className="flex items-center gap-2 bg-brand-gold text-black px-6 md:px-8 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
                     >
                         {isSaving && <Clock className="animate-spin" size={14} />}
                         {isNew ? 'Create Task' : 'Save Changes'}
