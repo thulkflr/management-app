@@ -158,17 +158,20 @@ export default function ChecklistPage() {
     const openView = (item) => setModalConfig({ isOpen: true, type: 'view', data: item });
 
     if (loading) return (
-        <div className="max-w-6xl mx-auto p-4 space-y-6">
-            <div className="h-10 w-52 bg-brand-gold/10 animate-pulse rounded-lg"></div>
-            <div className="h-40 bg-brand-gold/10 animate-pulse rounded-3xl"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-brand-gold/10 animate-pulse rounded-2xl"></div>)}
+        <div className="h-full p-4 md:p-8">
+            <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
+                <div className="h-10 w-52 bg-brand-gold/10 rounded-lg"></div>
+                <div className="h-40 bg-brand-gold/10 rounded-3xl"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-brand-gold/10 rounded-2xl"></div>)}
+                </div>
             </div>
         </div>
     );
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-10">
+        <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div className="max-w-6xl mx-auto space-y-8 pb-10">
             <div className="flex flex-col gap-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
                     <div className="space-y-1">
@@ -469,6 +472,7 @@ export default function ChecklistPage() {
                     </div>
                 )}
             </AppModal>
+            </div>
         </div>
     );
 }

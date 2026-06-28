@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { Send, User, MessageSquare } from 'lucide-react';
 import { useTasks } from '@/context/TasksContext';

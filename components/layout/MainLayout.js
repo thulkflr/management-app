@@ -151,7 +151,7 @@ export default function MainLayout({ children }) {
                     </aside>
 
                     {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto p-4 md:p-8 relative pb-32 md:pb-8">
+                    <main className="flex-1 overflow-hidden p-0 md:p-0 relative">
                         {children}
                     </main>
                 </div>

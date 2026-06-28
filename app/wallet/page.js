@@ -64,16 +64,19 @@ export default function Wallet() {
     };
 
     if (loading) return (
-        <div className="max-w-5xl mx-auto p-4 space-y-4">
-            <div className="h-8 w-48 bg-brand-gold/10 animate-pulse rounded"></div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-brand-gold/10 animate-pulse rounded-xl"></div>)}
+        <div className="h-full p-4 md:p-8">
+            <div className="max-w-5xl mx-auto space-y-4 animate-pulse">
+                <div className="h-8 w-48 bg-brand-gold/10 rounded"></div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-brand-gold/10 rounded-xl"></div>)}
+                </div>
             </div>
         </div>
     );
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">Wallet & Capital</h1>
                 <button
@@ -412,6 +415,7 @@ export default function Wallet() {
                     </div>
                 )}
             </AppModal>
+            </div>
         </div>
     );
 }
