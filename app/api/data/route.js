@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { getSheetData, addRowToSheet, deleteRowFromSheet, updateRowInSheet } from '@/lib/googleSheets';
 import { auth } from '@/auth';
 import { notificationService } from '@/lib/email/notificationService';
@@ -37,9 +37,8 @@ export async function POST(request) {
 
         const result = await addRowToSheet(type, payload);
 
-        // Background Trigger for Task Notification
         if (type === 'Tasks') {
-            notificationService.notifyTaskCreated(result).catch(e => console.error('Email error:', e));
+            after(() => notificationService.notifyTaskCreated(result).catch(e => console.error('Email error:', e)));
         }
 
         return NextResponse.json(result);
@@ -53,25 +52,17 @@ export async function PATCH(request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
-        const { type, id, payload } = await request.json();
+        const { type, id, payload, originalTask } = await request.json();
 
         const isAdmin = session.user.role === 'Admin';
         if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
             return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
         }
 
-        let originalTask = null;
-        if (type === 'Tasks') {
-            const allTasks = await getSheetData('Tasks');
-            originalTask = allTasks.find(t => t.id === id);
-        }
-
         const result = await updateRowInSheet(type, id, payload);
 
-        // Background Trigger for Task Update Notification
         if (type === 'Tasks' && originalTask) {
-            notificationService.notifyTaskUpdate(originalTask, payload)
-                .catch(e => console.error('Email error:', e));
+            after(() => notificationService.notifyTaskUpdate(originalTask, payload).catch(e => console.error('Email error:', e)));
         }
 
         return NextResponse.json(result);
