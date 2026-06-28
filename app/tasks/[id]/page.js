@@ -10,7 +10,7 @@ import { useTasks } from '@/context/TasksContext';
 
 export default function TaskDetailPage() {
     const { id } = useParams();
-    const { tasks, boardColumns } = useTasks();
+    const { tasks, columns } = useTasks();
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,8 @@ export default function TaskDetailPage() {
 
     // Get readable status from column ID
     const getStatusLabel = (statusId) => {
-        const col = boardColumns.find(c => c.id === statusId);
+        if (!columns || !Array.isArray(columns)) return statusId;
+        const col = columns.find(c => c.id === statusId);
         return col ? col.label : statusId;
     };
 
