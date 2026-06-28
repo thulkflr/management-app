@@ -4,11 +4,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { tasksService } from '@/services/tasksService';
 import { useSession } from 'next-auth/react';
+import { useAppContext } from './AppContext';
 
 const TasksContext = createContext();
 
 export function TasksProvider({ children }) {
     const { status } = useSession();
+    const { data: appData } = useAppContext();
     const [tasks, setTasks] = useState([]);
     const [columns, setColumns] = useState([]);
     const [comments, setComments] = useState({}); // Keyed by taskId
@@ -103,6 +105,16 @@ export function TasksProvider({ children }) {
         }
     };
 
+    const buildEmailHints = (assigneeName, oldStatusId, newStatusId) => {
+        const member = (appData?.members || []).find(m => m.name?.trim() === assigneeName?.trim());
+        return {
+            recipientEmail: member?.email || null,
+            oldStatusLabel: (columns.find(c => c.id === oldStatusId) || {}).label || oldStatusId,
+            newStatusLabel: (columns.find(c => c.id === newStatusId) || {}).label || newStatusId,
+            statusLabel: (columns.find(c => c.id === (newStatusId || oldStatusId)) || {}).label || newStatusId,
+        };
+    };
+
     const addTask = async (task) => {
         const tempId = `temp-${Date.now()}`;
         const newTask = { 
@@ -116,12 +128,13 @@ export function TasksProvider({ children }) {
         setTasks(prev => [newTask, ...prev]);
 
         try {
+            const hints = buildEmailHints(task.assignee, null, task.status);
             const result = await tasksService.createTask({
                 ...task,
                 id: `${Date.now()}`, // Real ID format
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
-            });
+            }, hints);
             // Update tempId with real data
             setTasks(prev => prev.map(t => t.id === tempId ? result : t));
         } catch (error) {
@@ -140,7 +153,12 @@ export function TasksProvider({ children }) {
         setTasks(prev => prev.map(t => t.id === id ? updatedTask : t));
 
         try {
-            await tasksService.updateTask(id, { ...updates, updatedAt: new Date().toISOString() }, oldTask);
+            const hints = buildEmailHints(
+                updates.assignee || oldTask.assignee,
+                oldTask.status,
+                updates.status || oldTask.status
+            );
+            await tasksService.updateTask(id, { ...updates, updatedAt: new Date().toISOString() }, oldTask, hints);
         } catch (error) {
             setTasks(prev => prev.map(t => t.id === id ? oldTask : t));
             throw error;

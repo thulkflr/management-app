@@ -28,7 +28,7 @@ export async function POST(request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
-        const { type, payload } = await request.json();
+        const { type, payload, hints } = await request.json();
 
         const isAdmin = session.user.role === 'Admin';
         if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
@@ -38,7 +38,7 @@ export async function POST(request) {
         const result = await addRowToSheet(type, payload);
 
         if (type === 'Tasks') {
-            after(() => notificationService.notifyTaskCreated(result).catch(e => console.error('Email error:', e)));
+            after(() => notificationService.notifyTaskCreated(result, hints || {}).catch(e => console.error('Email error:', e)));
         }
 
         return NextResponse.json(result);
@@ -52,7 +52,7 @@ export async function PATCH(request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
-        const { type, id, payload, originalTask } = await request.json();
+        const { type, id, payload, originalTask, hints } = await request.json();
 
         const isAdmin = session.user.role === 'Admin';
         if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
@@ -62,7 +62,7 @@ export async function PATCH(request) {
         const result = await updateRowInSheet(type, id, payload);
 
         if (type === 'Tasks' && originalTask) {
-            after(() => notificationService.notifyTaskUpdate(originalTask, payload).catch(e => console.error('Email error:', e)));
+            after(() => notificationService.notifyTaskUpdate(originalTask, payload, hints || {}).catch(e => console.error('Email error:', e)));
         }
 
         return NextResponse.json(result);
