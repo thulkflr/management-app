@@ -10,7 +10,7 @@ const TasksContext = createContext();
 
 export function TasksProvider({ children }) {
     const { status } = useSession();
-    const { data: appData } = useAppContext();
+    const { data: appData } = useAppContext() || {};
     const [tasks, setTasks] = useState([]);
     const [columns, setColumns] = useState([]);
     const [comments, setComments] = useState({}); // Keyed by taskId

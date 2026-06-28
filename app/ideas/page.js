@@ -1,8 +1,8 @@
 // app/ideas/page.js
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { Lightbulb, Plus, X, Star, Tag, User, MessageSquare } from 'lucide-react';
+import { Lightbulb, Plus, X, Star, Tag, User } from 'lucide-react';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
 import Loader from '@/components/Loader';
@@ -16,14 +16,82 @@ const INITIAL_FORM_DATA = {
     createdBy: ''
 };
 
+const CATEGORIES = ['Portrait', 'Landscape', 'Street', 'Commercial', 'Abstract', 'Nature', 'Cinematic'];
+
+const StarRating = ({ value, onChange }) => (
+    <div className="flex items-center gap-1.5 bg-background p-3 rounded-2xl border border-card-border">
+        {[1, 2, 3, 4, 5].map(num => (
+            <button key={num} type="button" onClick={() => onChange(num)}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${value >= num ? 'bg-brand-gold/20 text-brand-gold scale-110' : 'text-foreground/20 hover:text-brand-gold/60'}`}>
+                <Star size={18} fill={value >= num ? 'currentColor' : 'none'} />
+            </button>
+        ))}
+    </div>
+);
+
+const IdeaFormFields = ({ formData, setFormData }) => (
+    <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Title</label>
+                <input required type="text" placeholder="e.g. Neon Night Portraits"
+                    value={formData.title} onChange={e => setFormData(p => ({ ...p, title: e.target.value }))}
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+            </div>
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributed By</label>
+                <input type="text" placeholder="Your name"
+                    value={formData.createdBy} onChange={e => setFormData(p => ({ ...p, createdBy: e.target.value }))}
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+            </div>
+        </div>
+        <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Concept</label>
+            <textarea placeholder="Lighting setup, mood, visual references..."
+                value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
+                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition h-28 resize-none text-sm font-bold" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Category</label>
+                <select value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))}
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
+                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+            </div>
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Tags</label>
+                <input type="text" placeholder="night, low-light, color..."
+                    value={formData.tags} onChange={e => setFormData(p => ({ ...p, tags: e.target.value }))}
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+            </div>
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Potential (1–5)</label>
+                <StarRating value={formData.rating} onChange={v => setFormData(p => ({ ...p, rating: v }))} />
+            </div>
+        </div>
+    </>
+);
+
 export default function Ideas() {
     const { data, loading, addRecord, updateRecord, deleteRecord } = useAppContext();
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState(INITIAL_FORM_DATA);
     const [isSaving, setIsSaving] = useState(false);
-
-    // Modal state
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [activeCategory, setActiveCategory] = useState('All');
+
+    const categories = useMemo(() => {
+        const cats = new Set((data.ideas || []).map(i => i.category).filter(Boolean));
+        return ['All', ...Array.from(cats).sort()];
+    }, [data.ideas]);
+
+    const filtered = useMemo(() =>
+        activeCategory === 'All'
+            ? (data.ideas || [])
+            : (data.ideas || []).filter(i => i.category === activeCategory),
+        [data.ideas, activeCategory]
+    );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,19 +106,16 @@ export default function Ideas() {
             setShowForm(false);
             setFormData(INITIAL_FORM_DATA);
         } catch (err) {
-            alert('❌ فشل الحفظ: ' + err.message);
+            alert('❌ ' + err.message);
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleDelete = async (idea) => {
-        if (confirm(`Are you sure you want to delete "${idea.title}"?`)) {
-            try {
-                await deleteRecord('Ideas', idea.id);
-            } catch (err) {
-                alert('❌ فشل الحذف: ' + err.message);
-            }
+        if (confirm(`Delete "${idea.title}"?`)) {
+            try { await deleteRecord('Ideas', idea.id); }
+            catch (err) { alert('❌ ' + err.message); }
         }
     };
 
@@ -59,361 +124,205 @@ export default function Ideas() {
         setModalConfig({ isOpen: true, type: 'edit', data: idea });
     };
 
-    const openView = (idea) => {
-        setModalConfig({ isOpen: true, type: 'view', data: idea });
-    };
+    const openView = (idea) => setModalConfig({ isOpen: true, type: 'view', data: idea });
 
     if (loading) return (
-        <div className="h-full p-4 md:p-8">
-            <div className="max-w-5xl mx-auto space-y-6 animate-pulse">
-                <div className="h-10 w-48 bg-brand-gold/10 rounded-lg"></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-brand-gold/10 rounded-2xl"></div>)}
-                </div>
+        <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
+            <div className="h-8 w-52 bg-brand-gold/10 rounded-xl" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1,2,3,4].map(i => <div key={i} className="h-48 bg-brand-gold/10 rounded-3xl" />)}
             </div>
         </div>
     );
 
     return (
         <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar">
-            <div className="max-w-6xl mx-auto space-y-8 pb-10">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">Photography Ideas</h1>
-                    <p className="text-foreground/40 text-[10px] font-black uppercase tracking-widest">Inspiration and creative plans for future shoots</p>
-                </div>
-                <button
-                    onClick={() => {
-                        setShowForm(!showForm);
-                        setFormData(INITIAL_FORM_DATA);
-                        setModalConfig({ isOpen: false, type: null, data: null });
-                    }}
-                    className="w-full sm:w-auto bg-brand-gold text-black px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
-                >
-                    {showForm ? <X size={20} /> : <Plus size={20} />}
-                    {showForm ? 'Cancel' : 'Add New Idea'}
-                </button>
-            </div>
+            <div className="max-w-6xl mx-auto space-y-7 pb-10">
 
-            {/* Form */}
-            {showForm && (
-                <form onSubmit={handleSubmit} className="bg-card-bg p-6 md:p-10 rounded-3xl border border-card-border shadow-2xl space-y-8 animate-in fade-in slide-in-from-top-6 duration-500">
-                    <div className="flex items-center gap-3 border-b border-card-border pb-4">
-                        <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold">
-                            <Lightbulb size={24} />
-                        </div>
-                        <h2 className="text-2xl font-bold text-foreground">Submit New Insight</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70 flex items-center gap-2">
-                                <MessageSquare size={16} className="text-brand-gold" /> Title
-                            </label>
-                            <input
-                                required
-                                type="text"
-                                placeholder="e.g. Neon Night Portraits"
-                                value={formData.title}
-                                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70 flex items-center gap-2">
-                                <User size={16} className="text-brand-gold" /> Contributed By
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Your Name"
-                                value={formData.createdBy}
-                                onChange={e => setFormData({ ...formData, createdBy: e.target.value })}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-foreground/70 text-foreground">Detailed Concept</label>
-                        <textarea
-                            placeholder="Explain the vision, lighting setup, or general idea..."
-                            value={formData.description}
-                            onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all h-32 resize-none"
-                        ></textarea>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70">Theme/Category</label>
-                            <select
-                                value={formData.category}
-                                onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all appearance-none cursor-pointer"
-                            >
-                                <option>Portrait</option>
-                                <option>Landscape</option>
-                                <option>Street</option>
-                                <option>Commercial</option>
-                                <option>Abstract</option>
-                                <option>Nature</option>
-                                <option>Cinematic</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70 flex items-center gap-2">
-                                <Tag size={16} className="text-brand-gold" /> Tags
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="night, low-light, color"
-                                value={formData.tags}
-                                onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70">Potential (1-5)</label>
-                            <div className="flex items-center gap-3 bg-background p-3 rounded-2xl border border-card-border">
-                                {[1, 2, 3, 4, 5].map(num => (
-                                    <button
-                                        key={num}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, rating: num })}
-                                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${formData.rating >= num ? 'bg-brand-gold/20 text-brand-gold scale-110 shadow-sm' : 'text-foreground/20 hover:text-brand-gold'
-                                            }`}
-                                    >
-                                        <Star size={20} fill={formData.rating >= num ? "currentColor" : "none"} />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                                <Lightbulb size={18} />
+                            </span>
+                            Ideas
+                        </h1>
+                        <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
+                            {(data.ideas || []).length} concept{(data.ideas || []).length !== 1 ? 's' : ''} cataloged
+                        </p>
                     </div>
                     <button
-                        disabled={isSaving}
-                        type="submit"
-                        className="bg-foreground text-background p-5 rounded-2xl w-full font-extrabold text-lg shadow-2xl hover:opacity-90 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 disabled:opacity-50"
+                        onClick={() => { setShowForm(s => !s); setFormData(INITIAL_FORM_DATA); setModalConfig({ isOpen: false, type: null, data: null }); }}
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
-                        {isSaving && <Loader size={20} />}
-                        {isSaving ? 'Preserving...' : 'Preserve Idea'}
+                        {showForm ? <X size={16} /> : <Plus size={16} />}
+                        {showForm ? 'Cancel' : 'New Idea'}
                     </button>
-                </form>
-            )}
+                </div>
 
-            {/* Ideas Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {(!data.ideas || data.ideas.length === 0) ? (
-                    <div className="col-span-full text-center py-32 bg-card-bg rounded-[2.5rem] border border-dashed border-card-border text-foreground/20">
-                        <div className="bg-brand-gold/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-gold/20">
-                            <Lightbulb size={40} />
-                        </div>
-                        <p className="italic text-lg font-medium">No creative ideas cataloged yet. Start the spark!</p>
+                {/* Add form */}
+                {showForm && (
+                    <form onSubmit={handleSubmit} className="bg-card-bg p-6 md:p-8 rounded-3xl border border-card-border shadow-2xl space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <h2 className="text-base font-black text-foreground uppercase tracking-widest">New Idea</h2>
+                        <IdeaFormFields formData={formData} setFormData={setFormData} />
+                        <button disabled={isSaving} type="submit"
+                            className="bg-foreground text-background p-4 rounded-2xl w-full font-black text-sm shadow-xl hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            {isSaving && <Loader size={16} />}
+                            {isSaving ? 'Saving...' : 'Save Idea'}
+                        </button>
+                    </form>
+                )}
+
+                {/* Category filter */}
+                {categories.length > 1 && (
+                    <div className="flex gap-2 flex-wrap">
+                        {categories.map(cat => (
+                            <button key={cat} onClick={() => setActiveCategory(cat)}
+                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+                                    activeCategory === cat
+                                        ? 'bg-brand-gold text-black border-brand-gold shadow-lg shadow-brand-gold/20'
+                                        : 'border-card-border text-foreground/40 hover:border-brand-gold/30 hover:text-foreground/70'
+                                }`}>
+                                {cat}
+                            </button>
+                        ))}
                     </div>
-                ) : (
-                    data.ideas.map(idea => (
-                        <div key={idea.id} className="bg-card-bg p-6 rounded-[2rem] shadow-sm border border-card-border hover:shadow-2xl hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-bl-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-700"></div>
+                )}
 
-                            <div className="relative z-10 space-y-5">
-                                <div className="flex justify-between items-start gap-4">
-                                    <div className="space-y-2 flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-2 py-0.5 bg-brand-gold/10 text-brand-gold text-[8px] font-black uppercase tracking-[0.2em] rounded-md border border-brand-gold/10 italic">
-                                                {idea.category}
-                                            </span>
-                                            <div className="flex text-brand-gold opacity-40">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} size={10} fill={i < Number(idea.rating) ? "currentColor" : "none"} />
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <h3 className="font-black text-lg text-foreground group-hover:text-brand-gold transition-colors leading-tight truncate">
-                                            {idea.title}
-                                        </h3>
-                                    </div>
-                                    <div className="w-10 h-10 rounded-xl bg-brand-gold/10 flex items-center justify-center text-brand-gold/30 group-hover:bg-brand-gold group-hover:text-black transition-all duration-500 shadow-sm border border-brand-gold/10">
-                                        <Lightbulb size={20} />
+                {/* Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {filtered.length === 0 ? (
+                        <div className="col-span-full py-28 bg-card-bg rounded-3xl border border-dashed border-card-border text-center text-foreground/30">
+                            <Lightbulb size={40} className="mx-auto mb-3 opacity-20" />
+                            <p className="font-black uppercase tracking-widest text-sm">No ideas yet</p>
+                            <p className="text-xs mt-1 font-medium">Start capturing your creative vision.</p>
+                        </div>
+                    ) : filtered.map(idea => (
+                        <div key={idea.id} className="bg-card-bg rounded-3xl border border-card-border hover:border-brand-gold/25 hover:shadow-xl hover:shadow-brand-gold/5 transition-all duration-300 overflow-hidden group relative flex flex-col">
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-brand-gold/4 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+
+                            <div className="p-5 flex flex-col flex-1 space-y-4">
+                                {/* Category + stars */}
+                                <div className="flex items-center justify-between">
+                                    <span className="px-2.5 py-1 bg-brand-gold/8 text-brand-gold text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-gold/15 italic">
+                                        {idea.category}
+                                    </span>
+                                    <div className="flex items-center gap-0.5 text-brand-gold/50">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star key={i} size={11} fill={i < Number(idea.rating) ? 'currentColor' : 'none'} strokeWidth={1.5} />
+                                        ))}
                                     </div>
                                 </div>
 
+                                {/* Title */}
+                                <h3 className="font-black text-lg text-foreground group-hover:text-brand-gold transition-colors leading-snug">
+                                    {idea.title}
+                                </h3>
+
+                                {/* Description */}
                                 {idea.description && (
-                                    <p className="text-xs text-foreground/50 leading-relaxed font-medium line-clamp-2 italic opacity-60">
+                                    <p className="text-xs text-foreground/45 leading-relaxed font-medium line-clamp-2 italic">
                                         &quot;{idea.description}&quot;
                                     </p>
                                 )}
 
-                                <div className="flex flex-wrap gap-1.5 pt-1">
-                                    {(idea.tags || "").split(',').filter(t => t.trim()).map((tag, idx) => (
-                                        <span key={idx} className="flex items-center gap-1 px-2 py-1 bg-white/5 text-foreground/40 text-[9px] font-black uppercase tracking-widest rounded-lg border border-card-border">
-                                            #{tag.trim()}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                <div className="pt-4 border-t border-card-border flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-lg bg-brand-gold/10 flex items-center justify-center text-brand-gold font-black text-[10px] border border-brand-gold/20 shadow-inner">
-                                            {idea.createdBy?.charAt(0).toUpperCase() || '?'}
-                                        </div>
-                                        <span className="text-[9px] text-foreground/30 font-black uppercase tracking-[0.2em]">{idea.createdBy || 'General'}</span>
+                                {/* Tags */}
+                                {idea.tags && (
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {String(idea.tags).split(',').filter(t => t.trim()).map((tag, idx) => (
+                                            <span key={idx} className="flex items-center gap-1 px-2 py-0.5 bg-white/4 text-foreground/35 text-[9px] font-black uppercase tracking-widest rounded-lg border border-card-border">
+                                                <Tag size={8} className="text-brand-gold/30" />
+                                                {tag.trim()}
+                                            </span>
+                                        ))}
                                     </div>
-                                    <ActionButtons
-                                        onView={() => openView(idea)}
-                                        onEdit={() => openEdit(idea)}
-                                        onDelete={() => handleDelete(idea)}
-                                    />
+                                )}
+
+                                {/* Footer */}
+                                <div className="mt-auto pt-4 border-t border-card-border flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold font-black text-[10px]">
+                                            {idea.createdBy?.charAt(0)?.toUpperCase() || <User size={10} />}
+                                        </div>
+                                        <span className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">
+                                            {idea.createdBy || 'Anonymous'}
+                                        </span>
+                                    </div>
+                                    <ActionButtons onView={() => openView(idea)} onEdit={() => openEdit(idea)} onDelete={() => handleDelete(idea)} />
                                 </div>
                             </div>
                         </div>
-                    ))
-                )}
+                    ))}
+                </div>
             </div>
 
             {/* Modals */}
-            <AppModal
-                isOpen={modalConfig.isOpen}
-                onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}
-                title={modalConfig.type === 'edit' ? 'Edit Idea' : 'Idea Details'}
-            >
+            <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}
+                title={modalConfig.type === 'edit' ? 'Edit Idea' : 'Idea Details'}>
                 {modalConfig.type === 'edit' ? (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-foreground/70">Title</label>
-                                <input
-                                    required
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-foreground/70">Contributed By</label>
-                                <input
-                                    type="text"
-                                    value={formData.createdBy}
-                                    onChange={e => setFormData({ ...formData, createdBy: e.target.value })}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-foreground/70">Detailed Concept</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all h-32 resize-none"
-                            ></textarea>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-foreground/70">Theme/Category</label>
-                                <select
-                                    value={formData.category}
-                                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                                >
-                                    <option>Portrait</option>
-                                    <option>Landscape</option>
-                                    <option>Street</option>
-                                    <option>Commercial</option>
-                                    <option>Abstract</option>
-                                    <option>Nature</option>
-                                    <option>Cinematic</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-foreground/70">Tags</label>
-                                <input
-                                    type="text"
-                                    value={formData.tags}
-                                    onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold outline-none transition-all"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-foreground/70">Potential (1-5)</label>
-                                <div className="flex items-center gap-2 bg-background p-3 rounded-2xl border border-card-border">
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <button
-                                            key={num}
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, rating: num })}
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${formData.rating >= num ? 'bg-brand-gold/20 text-brand-gold' : 'text-foreground/20'}`}
-                                        >
-                                            <Star size={16} fill={formData.rating >= num ? "currentColor" : "none"} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                        <button
-                            disabled={isSaving}
-                            type="submit"
-                            className="bg-brand-gold text-black p-5 rounded-2xl w-full font-extrabold text-lg shadow-2xl hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                            {isSaving && <Loader size={20} />}
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <IdeaFormFields formData={formData} setFormData={setFormData} />
+                        <button disabled={isSaving} type="submit"
+                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Idea'}
                         </button>
                     </form>
-                ) : modalConfig.data && (
-                    <div className="space-y-8">
-                        <div className="flex justify-between items-start border-b border-card-border pb-6">
-                            <div className="space-y-2">
-                                <h3 className="text-3xl font-black text-foreground leading-tight">{modalConfig.data.title}</h3>
-                                <div className="flex items-center gap-4">
-                                    <span className="px-3 py-1 bg-brand-gold/10 text-brand-gold text-xs font-black uppercase tracking-widest rounded-full border border-brand-gold/10 italic">
-                                        {modalConfig.data.category}
-                                    </span>
-                                    <div className="flex text-brand-gold">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star key={i} size={16} fill={i < Number(modalConfig.data.rating) ? "currentColor" : "none"} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="w-16 h-16 rounded-3xl bg-brand-gold/10 flex items-center justify-center text-brand-gold shadow-sm border border-brand-gold/10">
-                                <Lightbulb size={32} />
-                            </div>
-                        </div>
-
-                        {modalConfig.data.description && (
-                            <div className="space-y-3">
-                                <p className="text-xs font-black text-foreground/30 uppercase tracking-[0.2em]">Detailed Vision</p>
-                                <p className="text-foreground/70 leading-relaxed text-lg font-medium bg-white/5 p-6 rounded-3xl border border-card-border italic">
-                                    &quot;{modalConfig.data.description}&quot;
-                                </p>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                                <p className="text-xs font-black text-foreground/30 uppercase tracking-[0.2em]">Creator</p>
-                                <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-card-border">
-                                    <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold font-black border border-brand-gold/10">
-                                        {modalConfig.data.createdBy?.charAt(0).toUpperCase() || '?'}
-                                    </div>
-                                    <p className="text-lg font-bold text-foreground">{modalConfig.data.createdBy || 'Anonymous'}</p>
-                                </div>
-                            </div>
-                            <div className="space-y-3">
-                                <p className="text-xs font-black text-foreground/30 uppercase tracking-[0.2em]">Keywords</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {(modalConfig.data.tags || "").split(',').filter(t => t.trim()).map((tag, idx) => (
-                                        <span key={idx} className="px-3 py-2 bg-background border border-card-border rounded-xl text-foreground/50 text-xs font-bold flex items-center gap-2">
-                                            <Tag size={12} className="text-brand-gold/40" />
-                                            {tag.trim()}
+                ) : modalConfig.data && (() => {
+                    const idea = modalConfig.data;
+                    return (
+                        <div className="space-y-5">
+                            <div className="flex justify-between items-start pb-5 border-b border-card-border">
+                                <div className="space-y-2 flex-1 pr-4">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="px-3 py-1 bg-brand-gold/10 text-brand-gold text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-gold/15 italic">
+                                            {idea.category}
                                         </span>
-                                    ))}
+                                        <div className="flex text-brand-gold">
+                                            {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={i < Number(idea.rating) ? 'currentColor' : 'none'} />)}
+                                        </div>
+                                    </div>
+                                    <h3 className="text-2xl font-black text-foreground leading-tight">{idea.title}</h3>
+                                </div>
+                                <div className="w-14 h-14 rounded-2xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center text-brand-gold flex-shrink-0">
+                                    <Lightbulb size={26} />
                                 </div>
                             </div>
+
+                            {idea.description && (
+                                <p className="text-sm text-foreground/60 leading-relaxed italic bg-white/3 p-4 rounded-2xl border border-card-border">
+                                    &quot;{idea.description}&quot;
+                                </p>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                    <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Creator</p>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold font-black text-sm">
+                                            {idea.createdBy?.charAt(0)?.toUpperCase() || '?'}
+                                        </div>
+                                        <p className="text-sm font-black text-foreground">{idea.createdBy || 'Anonymous'}</p>
+                                    </div>
+                                </div>
+                                {idea.tags && (
+                                    <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                        <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Keywords</p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {String(idea.tags).split(',').filter(t => t.trim()).map((tag, idx) => (
+                                                <span key={idx} className="px-2 py-0.5 bg-background border border-card-border rounded-lg text-foreground/50 text-[10px] font-bold">
+                                                    #{tag.trim()}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
             </AppModal>
-            </div>
         </div>
     );
 }

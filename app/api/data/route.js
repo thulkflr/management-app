@@ -11,7 +11,7 @@ export async function GET(request) {
     const type = searchParams.get('type'); 
 
     const isAdmin = session.user.role === 'Admin';
-    if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
+    if (!isAdmin && type === 'Wallet') {
         return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }
 
