@@ -30,7 +30,7 @@ export function AppProvider({ children }) {
             ]);
 
             const [members, transactionsRaw, projects, ideas, checklist] = await Promise.all([
-                membersRes.json(),
+                membersRes.ok ? membersRes.json() : Promise.resolve([]),
                 txRes.json(),
                 projectsRes.json(),
                 ideasRes.json(),
