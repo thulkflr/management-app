@@ -9,21 +9,21 @@ export const tasksService = {
         return res.json();
     },
 
-    async createTask(task) {
+    async createTask(task, hints = {}) {
         const res = await fetch(API_BASE, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'Tasks', payload: task }),
+            body: JSON.stringify({ type: 'Tasks', payload: task, hints }),
         });
         if (!res.ok) throw new Error('Failed to create task');
         return res.json();
     },
 
-    async updateTask(id, updates, originalTask) {
+    async updateTask(id, updates, originalTask, hints = {}) {
         const res = await fetch(API_BASE, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'Tasks', id, payload: updates, originalTask }),
+            body: JSON.stringify({ type: 'Tasks', id, payload: updates, originalTask, hints }),
         });
         if (!res.ok) throw new Error('Failed to update task');
         return res.json();
