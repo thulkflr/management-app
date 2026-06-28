@@ -5,7 +5,7 @@ import KanbanBoard from '@/components/tasks/KanbanBoard';
 
 export default function TasksPage() {
     return (
-        <div className="max-w-[1600px] mx-auto h-full">
+        <div className="h-full overflow-hidden p-4 md:p-8">
             <KanbanBoard />
         </div>
     );
