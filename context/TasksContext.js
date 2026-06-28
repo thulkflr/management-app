@@ -140,7 +140,7 @@ export function TasksProvider({ children }) {
         setTasks(prev => prev.map(t => t.id === id ? updatedTask : t));
 
         try {
-            await tasksService.updateTask(id, { ...updates, updatedAt: new Date().toISOString() });
+            await tasksService.updateTask(id, { ...updates, updatedAt: new Date().toISOString() }, oldTask);
         } catch (error) {
             setTasks(prev => prev.map(t => t.id === id ? oldTask : t));
             throw error;

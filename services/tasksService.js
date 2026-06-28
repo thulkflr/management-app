@@ -19,11 +19,11 @@ export const tasksService = {
         return res.json();
     },
 
-    async updateTask(id, updates) {
+    async updateTask(id, updates, originalTask) {
         const res = await fetch(API_BASE, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'Tasks', id, payload: updates }),
+            body: JSON.stringify({ type: 'Tasks', id, payload: updates, originalTask }),
         });
         if (!res.ok) throw new Error('Failed to update task');
         return res.json();
