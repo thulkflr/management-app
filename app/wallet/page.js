@@ -177,10 +177,10 @@ export default function Wallet() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
                                 <WalletIcon size={18} />
                             </span>
-                            Wallet
+                            Studio <span className="text-brand-gold italic">Finance</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {data.transactions.length} transactions total

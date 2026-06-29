@@ -1,66 +1,120 @@
 @import "tailwindcss";
 
 :root {
-  /* Default to a premium Dark Theme */
-  --background: #000000;
-  --foreground: #ffffff;
-  --brand-gold: #c5a022;
-  --brand-gold-muted: rgba(197, 160, 34, 0.1);
-  --card-bg: #0a0a0a;
-  --card-border: rgba(197, 160, 34, 0.15);
-  --sidebar-bg: #000000;
-  --accent-slate: #1a1a1a;
-  --text-muted: #94a3b8;
+  --background:      #050507;
+  --foreground:      #f4f4f5;
+  --brand-gold:      #c5a022;
+  --brand-gold-muted: rgba(197, 160, 34, 0.10);
+  --card-bg:         #0c0c0f;
+  --card-border:     rgba(197, 160, 34, 0.13);
+  --sidebar-bg:      #000000;
+  --surface-raised:  #111115;
+  --surface-hover:   #18181d;
+  --accent-slate:    #1a1a1f;
+  --text-muted:      #6b7280;
+  --glow-gold:       0 0 0 1px rgba(197,160,34,0.2), 0 8px 32px rgba(197,160,34,0.08);
 }
 
-/* If user explicitly wants light mode, we still keep it elegant but consistent */
 @media (prefers-color-scheme: light) {
   :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --brand-gold: #c5a022;
-    --brand-gold-muted: #fefce8;
-    --card-bg: #ffffff;
-    --card-border: #e2e8f0;
-    --sidebar-bg: #000000; /* Keeping sidebar dark for brand identity */
-    --accent-slate: #f1f5f9;
-    --text-muted: #64748b;
+    --background:     #f8fafc;
+    --foreground:     #0f172a;
+    --brand-gold:     #c5a022;
+    --brand-gold-muted: rgba(197, 160, 34, 0.08);
+    --card-bg:        #ffffff;
+    --card-border:    #e4e7ec;
+    --sidebar-bg:     #000000;
+    --surface-raised: #f1f5f9;
+    --surface-hover:  #e9edf2;
+    --accent-slate:   #f1f5f9;
+    --text-muted:     #64748b;
+    --glow-gold:      0 0 0 1px rgba(197,160,34,0.15), 0 8px 24px rgba(197,160,34,0.06);
   }
 }
 
 @theme inline {
-  --color-brand-gold: var(--brand-gold);
-  --color-brand-gold-muted: var(--brand-gold-muted);
-  --color-card-bg: var(--card-bg);
-  --color-card-border: var(--card-border);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent-slate: var(--accent-slate);
-  --color-text-muted: var(--text-muted);
+  --color-brand-gold:      var(--brand-gold);
+  --color-brand-gold-muted:var(--brand-gold-muted);
+  --color-card-bg:         var(--card-bg);
+  --color-card-border:     var(--card-border);
+  --color-background:      var(--background);
+  --color-foreground:      var(--foreground);
+  --color-accent-slate:    var(--accent-slate);
+  --color-text-muted:      var(--text-muted);
+  --color-surface-raised:  var(--surface-raised);
+  --color-surface-hover:   var(--surface-hover);
 }
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* Tabular numbers for all financial/data displays */
+.tabular { font-variant-numeric: tabular-nums; }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--brand-gold-muted) transparent; }
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--brand-gold-muted);
-  border-radius: 10px;
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(197,160,34,0.3); }
+
+/* ── Keyframes ────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-gold);
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(197,160,34,0); }
+  50%       { box-shadow: 0 0 0 6px rgba(197,160,34,0.10); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0px); }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────── */
+.animate-fade-up   { animation: fade-up 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-gold-pulse{ animation: gold-pulse 2.5s ease-in-out infinite; }
+
+.shimmer-text {
+  background: linear-gradient(90deg, var(--brand-gold) 0%, #f0c84a 40%, var(--brand-gold) 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Gold glow border — applied to the hero stat card */
+.glow-gold { box-shadow: var(--glow-gold); }
+
+/* Subtle noise texture overlay for sidebar */
+.sidebar-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.4;
 }
