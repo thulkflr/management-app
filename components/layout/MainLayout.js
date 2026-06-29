@@ -55,7 +55,7 @@ export default function MainLayout({ children }) {
                             {session && (
                                 <button
                                     onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className="p-2 text-foreground/30 hover:text-red-400 transition-colors rounded-lg"
+                                    className="p-2 text-white/40 hover:text-red-400 transition-colors rounded-lg"
                                     title="Logout"
                                 >
                                     <LogOut size={18} />
@@ -64,7 +64,7 @@ export default function MainLayout({ children }) {
                             <motion.button
                                 onClick={() => setIsSidebarOpen(v => !v)}
                                 whileTap={{ scale: 0.9 }}
-                                className="p-2 text-foreground/60 hover:text-foreground rounded-lg transition-colors"
+                                className="p-2 text-white/70 hover:text-white rounded-lg transition-colors"
                             >
                                 {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
                             </motion.button>
