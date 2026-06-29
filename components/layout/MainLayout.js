@@ -1,14 +1,14 @@
-// components/layout/MainLayout.js
 'use client';
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useSession, signOut } from "next-auth/react";
-import { 
-    LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb, 
-    ListChecks, LayoutList, LogOut, User as UserIcon 
+import { useSession, signOut } from 'next-auth/react';
+import {
+    LayoutDashboard, Users, Wallet, FolderKanban, Menu, X, Lightbulb,
+    ListChecks, LayoutList, LogOut, User as UserIcon
 } from 'lucide-react';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 
 import { AppProvider } from '@/context/AppContext';
 import { TasksProvider } from '@/context/TasksContext';
@@ -20,138 +20,174 @@ export default function MainLayout({ children }) {
     const isAdmin = session?.user?.role === 'Admin';
 
     const navItems = [
-        { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/tasks', label: 'Tasks', icon: LayoutList },
-        { href: '/projects', label: 'Projects', icon: FolderKanban },
-        { href: '/wallet', label: 'Wallet', icon: Wallet, adminOnly: true },
-        { href: '/members', label: 'Members', icon: Users, adminOnly: true },
-        { href: '/ideas', label: 'Ideas', icon: Lightbulb },
+        { href: '/',          label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/tasks',     label: 'Tasks',     icon: LayoutList },
+        { href: '/projects',  label: 'Projects',  icon: FolderKanban },
+        { href: '/wallet',    label: 'Wallet',    icon: Wallet,     adminOnly: true },
+        { href: '/members',   label: 'Members',   icon: Users,      adminOnly: true },
+        { href: '/ideas',     label: 'Ideas',     icon: Lightbulb },
         { href: '/checklist', label: 'Checklist', icon: ListChecks },
     ];
 
     const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
-
-    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
     const closeSidebar = () => setIsSidebarOpen(false);
 
-    // Don't show sidebar on login page
-    const isLoginPage = pathname === '/login';
-
-    if (isLoginPage) {
-        return <>{children}</>;
-    }
+    if (pathname === '/login') return <>{children}</>;
 
     return (
         <AppProvider>
             <TasksProvider>
                 <div className="bg-background text-foreground h-screen overflow-hidden flex flex-col md:flex-row">
-                    {/* Mobile Header */}
-                    <header className="md:hidden bg-black text-white p-4 flex justify-between items-center z-50 border-b border-brand-gold/20 backdrop-blur-md bg-black/90 sticky top-0">
+
+                    {/* ── Mobile Header ─────────────────────────────────────── */}
+                    <header className="md:hidden sticky top-0 z-50 bg-black/95 backdrop-blur-xl border-b border-brand-gold/15 flex justify-between items-center px-4 py-3">
                         <div className="flex items-center gap-3">
                             {session?.user?.image && (
-                                <div className="w-8 h-8 rounded-xl border border-brand-gold/30 overflow-hidden shadow-lg shadow-brand-gold/10">
+                                <div className="w-8 h-8 rounded-xl border border-brand-gold/30 overflow-hidden shadow-sm">
                                     <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
                                 </div>
                             )}
-                            <div className="text-lg font-black text-brand-gold tracking-tighter uppercase italic">
-                                CAPRICE <span className="text-white font-light not-italic opacity-50">MGMT</span>
+                            <div className="text-[17px] font-black text-brand-gold tracking-tighter uppercase italic leading-none">
+                                CAPRICE <span className="text-white/40 font-light not-italic text-sm">MGMT</span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
                             {session && (
-                                <button 
+                                <button
                                     onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                    className="p-2 text-foreground/30 hover:text-red-400 transition-colors rounded-lg"
                                     title="Logout"
                                 >
-                                    <LogOut size={20} />
+                                    <LogOut size={18} />
                                 </button>
                             )}
-                            <button onClick={toggleSidebar} className="p-2">
-                                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-                            </button>
+                            <motion.button
+                                onClick={() => setIsSidebarOpen(v => !v)}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-2 text-foreground/60 hover:text-foreground rounded-lg transition-colors"
+                            >
+                                {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
+                            </motion.button>
                         </div>
                     </header>
 
-                    {/* Sidebar */}
+                    {/* ── Mobile Overlay ────────────────────────────────────── */}
+                    <AnimatePresence>
+                        {isSidebarOpen && (
+                            <motion.div
+                                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 md:hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                onClick={closeSidebar}
+                            />
+                        )}
+                    </AnimatePresence>
+
+                    {/* ── Sidebar ───────────────────────────────────────────── */}
                     <aside className={`
-                        fixed inset-y-0 left-0 z-40 w-72 bg-black text-white transform transition-transform duration-300 ease-in-out
+                        fixed inset-y-0 left-0 z-40 w-[17rem] bg-black text-white transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
                         md:relative md:translate-x-0
                         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                        flex flex-col border-r border-brand-gold/11 shadow-2xl shadow-black
+                        flex flex-col border-r border-brand-gold/10 shadow-2xl shadow-black/50
                     `}>
-                        <div className="p-8">
-                            <div className="text-2xl font-black text-brand-gold tracking-tighter uppercase italic mb-1">
-                                CAPRICE <span className="text-white font-light not-italic opacity-30">MGMT</span>
+
+                        {/* Logo */}
+                        <div className="px-7 pt-8 pb-6 flex-shrink-0">
+                            <div className="text-[22px] font-black text-brand-gold tracking-tighter uppercase italic leading-none">
+                                CAPRICE
                             </div>
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Production Studio</p>
+                            <div className="text-white/20 font-light not-italic text-[11px] tracking-[0.35em] uppercase mt-0.5">
+                                MGMT · Studio
+                            </div>
                         </div>
 
-                        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar scrollbar-hide">
-                            {filteredNavItems.map((item) => {
-                                const Icon = item.icon;
-                                const isActive = pathname === item.href;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        onClick={closeSidebar}
-                                        className={`
-                                            flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group
-                                            ${isActive 
-                                                ? 'bg-brand-gold text-black font-black shadow-lg shadow-brand-gold/20 scale-[1.02]' 
-                                                : 'text-slate-400 hover:text-brand-gold hover:bg-white/5'}
-                                        `}
-                                    >
-                                        <Icon size={20} className={`${isActive ? 'text-black' : 'group-hover:translate-x-1 transition-transform'}`} />
-                                        <span className="uppercase tracking-widest text-[10px] font-black">{item.label}</span>
-                                    </Link>
-                                );
-                            })}
+                        {/* Nav */}
+                        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar">
+                            <LayoutGroup>
+                                {filteredNavItems.map((item) => {
+                                    const Icon = item.icon;
+                                    const isActive = pathname === item.href;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={closeSidebar}
+                                            className={`
+                                                relative flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-colors duration-150 group
+                                                ${isActive ? 'text-black' : 'text-white/40 hover:text-white/80 hover:bg-white/[0.04]'}
+                                            `}
+                                        >
+                                            {isActive && (
+                                                <motion.span
+                                                    layoutId="sidebar-active"
+                                                    className="absolute inset-0 rounded-2xl bg-brand-gold"
+                                                    style={{ zIndex: -1 }}
+                                                    transition={{ type: 'spring', stiffness: 420, damping: 38 }}
+                                                />
+                                            )}
+                                            <Icon
+                                                size={16}
+                                                strokeWidth={isActive ? 2.5 : 2}
+                                                className="flex-shrink-0"
+                                            />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.18em]">
+                                                {item.label}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </LayoutGroup>
                         </nav>
 
-                        {/* User Profile & Logout Section */}
+                        {/* User Card */}
                         {session?.user && (
-                            <div className="mx-4 mb-6 p-5 rounded-[28px] bg-white/[0.03] border border-white/5 backdrop-blur-sm">
-                                <div className="flex items-center gap-4 mb-5">
-                                    <div className="relative">
-                                        <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold shadow-lg overflow-hidden p-0.5">
+                            <div className="mx-3 mb-4 mt-2 p-4 rounded-[22px] bg-white/[0.03] border border-white/[0.06]">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="relative flex-shrink-0">
+                                        <div className="w-10 h-10 rounded-[13px] bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold overflow-hidden">
                                             {session.user.image ? (
-                                                <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover rounded-[14px]" />
+                                                <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
                                             ) : (
-                                                <UserIcon size={24} />
+                                                <UserIcon size={20} />
                                             )}
                                         </div>
-                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-4 border-black rounded-full" title="Online" />
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-black rounded-full" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-white uppercase tracking-wider truncate mb-0.5">
+                                        <p className="text-[11px] font-black text-white uppercase tracking-wide truncate leading-none mb-1">
                                             {session.user.name}
                                         </p>
                                         <div className="flex items-center gap-1.5">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse" />
-                                            <p className="text-[8px] font-bold text-brand-gold uppercase tracking-[0.2em] opacity-80">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
+                                            <p className="text-[9px] font-black text-brand-gold/70 uppercase tracking-[0.2em]">
                                                 {session.user.role || 'Member'}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
-                                <button 
+                                <motion.button
                                     onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-white/5 text-slate-400 hover:bg-red-500 hover:text-white transition-all font-black uppercase tracking-[0.2em] text-[9px] group border border-white/5 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl bg-white/[0.04] text-white/30 hover:bg-red-500/15 hover:text-red-400 transition-colors font-black uppercase tracking-[0.18em] text-[9px] border border-white/[0.05] hover:border-red-500/20"
                                 >
-                                    <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
+                                    <LogOut size={13} />
                                     Sign Out
-                                </button>
+                                </motion.button>
                             </div>
                         )}
-                        <div className="p-6 border-t border-white/5 text-center">
-                            <p className="text-[9px] text-slate-700 font-black uppercase tracking-[0.4em]">© 2026 CAPRICE MEDIA</p>
+
+                        <div className="px-6 pb-5 pt-2 border-t border-white/[0.04] text-center flex-shrink-0">
+                            <p className="text-[8px] text-white/15 font-black uppercase tracking-[0.45em]">
+                                © 2026 CAPRICE MEDIA
+                            </p>
                         </div>
                     </aside>
 
-                    {/* Main Content */}
-                    <main className="flex-1 overflow-hidden p-0 md:p-0 relative">
+                    {/* ── Main Content ──────────────────────────────────────── */}
+                    <main className="flex-1 overflow-hidden relative">
                         {children}
                     </main>
                 </div>
