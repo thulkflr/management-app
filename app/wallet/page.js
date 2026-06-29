@@ -24,6 +24,51 @@ const TYPE_CONFIG = {
     capital:  { label: 'Capital',  color: 'text-brand-gold bg-brand-gold/10 border-brand-gold/20', dot: 'bg-brand-gold' },
 };
 
+function TxFormFields({ formData, setFormData, members }) {
+    return (
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Description</label>
+                    <input required type="text" placeholder="e.g. Wedding Shoot Payment"
+                        value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributor</label>
+                    <select value={formData.memberId} onChange={e => setFormData(p => ({ ...p, memberId: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
+                        <option value="">General</option>
+                        {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                    </select>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Amount ($)</label>
+                    <input required type="number" min="0" step="0.01" placeholder="0.00"
+                        value={formData.amount} onChange={e => setFormData(p => ({ ...p, amount: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Type</label>
+                    <select value={formData.type} onChange={e => setFormData(p => ({ ...p, type: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
+                        <option value="income">Business Income</option>
+                        <option value="expense">Business Expense</option>
+                        <option value="capital">Capital Contribution</option>
+                    </select>
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date</label>
+                    <input required type="date" value={formData.date} onChange={e => setFormData(p => ({ ...p, date: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+            </div>
+        </>
+    );
+}
+
 export default function Wallet() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -124,50 +169,6 @@ export default function Wallet() {
         </div>
     );
 
-    // ── shared form fields ────────────────────────────────────────────────
-    const TxFormFields = () => (
-        <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Description</label>
-                    <input required type="text" placeholder="e.g. Wedding Shoot Payment"
-                        value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributor</label>
-                    <select value={formData.memberId} onChange={e => setFormData(p => ({ ...p, memberId: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                        <option value="">General</option>
-                        {data.members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                    </select>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Amount ($)</label>
-                    <input required type="number" min="0" step="0.01" placeholder="0.00"
-                        value={formData.amount} onChange={e => setFormData(p => ({ ...p, amount: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Type</label>
-                    <select value={formData.type} onChange={e => setFormData(p => ({ ...p, type: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                        <option value="income">Business Income</option>
-                        <option value="expense">Business Expense</option>
-                        <option value="capital">Capital Contribution</option>
-                    </select>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date</label>
-                    <input required type="date" value={formData.date} onChange={e => setFormData(p => ({ ...p, date: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-            </div>
-        </>
-    );
-
     return (
         <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar">
             <div className="max-w-5xl mx-auto space-y-6 pb-10">
@@ -227,7 +228,7 @@ export default function Wallet() {
                 {showForm && (
                     <form onSubmit={handleSubmit} className="bg-card-bg p-6 md:p-8 rounded-3xl border border-card-border shadow-2xl space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
                         <h2 className="text-base font-black text-foreground uppercase tracking-widest">New Transaction</h2>
-                        <TxFormFields />
+                        <TxFormFields formData={formData} setFormData={setFormData} members={data.members} />
                         <button disabled={isSaving} type="submit"
                             className="bg-foreground text-background p-4 rounded-2xl w-full font-black text-sm shadow-xl hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
@@ -496,7 +497,7 @@ export default function Wallet() {
                 title={modalConfig.type === 'edit' ? 'Edit Transaction' : 'Transaction Details'}>
                 {modalConfig.type === 'edit' ? (
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        <TxFormFields />
+                        <TxFormFields formData={formData} setFormData={setFormData} members={data.members} />
                         <button disabled={isSaving} type="submit"
                             className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
