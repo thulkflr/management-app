@@ -11,6 +11,42 @@ const INITIAL_FORM = { name: '', role: '', email: '', sharePercentage: '' };
 
 const ROLES = ['Photographer', 'Videographer', 'Editor', 'Assistant', 'Manager', 'Partner'];
 
+function MemberForm({ formData, setFormData }) {
+    return (
+        <div className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Full Name</label>
+                    <input required type="text" placeholder="e.g. Ahmad Khaled"
+                        value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Role</label>
+                    <input type="text" list="roles-list" placeholder="e.g. Photographer"
+                        value={formData.role} onChange={e => setFormData(p => ({ ...p, role: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    <datalist id="roles-list">{ROLES.map(r => <option key={r} value={r} />)}</datalist>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Email</label>
+                    <input type="email" placeholder="member@example.com"
+                        value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Profit Share %</label>
+                    <input required type="number" min="0" max="100" step="0.1" placeholder="e.g. 25"
+                        value={formData.sharePercentage} onChange={e => setFormData(p => ({ ...p, sharePercentage: e.target.value }))}
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function Members() {
     const { data, loading, addRecord, updateRecord, deleteRecord, netProfit } = useAppContext();
     const [showForm, setShowForm] = useState(false);
@@ -56,40 +92,6 @@ export default function Members() {
 
     const openView = (member) => setModalConfig({ isOpen: true, type: 'view', data: member });
 
-    const MemberForm = () => (
-        <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Full Name</label>
-                    <input required type="text" placeholder="e.g. Ahmad Khaled"
-                        value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Role</label>
-                    <input type="text" list="roles-list" placeholder="e.g. Photographer"
-                        value={formData.role} onChange={e => setFormData(p => ({ ...p, role: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                    <datalist id="roles-list">{ROLES.map(r => <option key={r} value={r} />)}</datalist>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Email</label>
-                    <input type="email" placeholder="member@example.com"
-                        value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Profit Share %</label>
-                    <input required type="number" min="0" max="100" step="0.1" placeholder="e.g. 25"
-                        value={formData.sharePercentage} onChange={e => setFormData(p => ({ ...p, sharePercentage: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-            </div>
-        </div>
-    );
-
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
             <div className="h-8 w-40 bg-brand-gold/10 rounded-xl" />
@@ -129,7 +131,7 @@ export default function Members() {
                 {showForm && (
                     <form onSubmit={handleSubmit} className="bg-card-bg p-6 md:p-8 rounded-3xl border border-card-border shadow-2xl space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
                         <h2 className="text-base font-black text-foreground uppercase tracking-widest">New Member</h2>
-                        <MemberForm />
+                        <MemberForm formData={formData} setFormData={setFormData} />
                         <button disabled={isSaving} type="submit"
                             className="bg-foreground text-background p-4 rounded-2xl w-full font-black text-sm shadow-xl hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
@@ -228,7 +230,7 @@ export default function Members() {
                 title={modalConfig.type === 'edit' ? 'Edit Member' : 'Member Details'}>
                 {modalConfig.type === 'edit' ? (
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        <MemberForm />
+                        <MemberForm formData={formData} setFormData={setFormData} />
                         <button disabled={isSaving} type="submit"
                             className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
