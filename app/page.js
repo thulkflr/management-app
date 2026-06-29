@@ -445,7 +445,7 @@ export default function Dashboard() {
                                 </div>
                                 <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
                                 <div className={`text-2xl font-black tracking-tighter ${kpi.hero ? kpi.color : 'text-foreground'}`}>
-                                    <NumberTicker value={absVal} prefix={kpi.value < 0 ? '-$' : '$'} decimals={0} duration={1.2} />
+                                    <NumberTicker value={absVal} prefix={kpi.value < 0 ? '-$' : '$'} decimals={2} duration={1.2} />
                                 </div>
                                 <p className={`text-[9px] font-bold mt-1.5 italic opacity-50 ${kpi.color}`}>{kpi.note}</p>
                             </motion.div>
@@ -518,7 +518,7 @@ export default function Dashboard() {
                                                 </div>
                                             </div>
                                             <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {isPos ? '' : '-'}$<NumberTicker value={Math.abs(share)} decimals={0} duration={1} />
+                                                {isPos ? '' : '-'}$<NumberTicker value={Math.abs(share)} decimals={2} duration={1} />
                                             </p>
                                         </div>
                                     );
