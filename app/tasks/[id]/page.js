@@ -3,10 +3,19 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import CommentsSection from '@/components/tasks/CommentsSection';
 import { TASK_PRIORITIES, TASK_TYPES } from '@/constants/taskConstants';
-import { Calendar, Clock, User, Tag, Flag, AlignLeft, ArrowLeft, Loader2 } from 'lucide-react';
+import { Calendar, Clock, User, Tag, Flag, AlignLeft, ArrowLeft, Loader2, ListTodo, CheckCircle2, Circle, Paperclip, FileText, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { useTasks } from '@/context/TasksContext';
+
+const parseJSON = (str, fallback) => {
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return fallback;
+    }
+};
 
 export default function TaskDetailPage() {
     const { id } = useParams();
@@ -53,6 +62,8 @@ export default function TaskDetailPage() {
 
     const priority = TASK_PRIORITIES[task.priority?.toUpperCase()] || TASK_PRIORITIES.MEDIUM;
     const taskType = TASK_TYPES.find(t => t.id === task.type) || TASK_TYPES[0];
+    const checklist = parseJSON(task.checklist, []);
+    const attachments = parseJSON(task.attachments, []);
 
     return (
         <div className="h-full overflow-y-auto custom-scrollbar">
@@ -88,6 +99,74 @@ export default function TaskDetailPage() {
                                 </p>
                             </div>
                         </div>
+
+                        {/* Checklist Card */}
+                        {checklist.length > 0 && (
+                            <div className="bg-card-bg border border-card-border rounded-3xl p-6 md:p-8 shadow-sm">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-8 h-8 rounded-xl bg-brand-gold/10 flex items-center justify-center text-brand-gold border border-brand-gold/20">
+                                        <ListTodo size={16} />
+                                    </div>
+                                    <h2 className="text-sm font-black uppercase tracking-widest text-foreground">Checklist</h2>
+                                </div>
+                                <div className="space-y-2">
+                                    {checklist.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className={`flex items-center gap-3 p-3 rounded-xl border ${
+                                                item.checked ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-background border-card-border'
+                                            }`}
+                                        >
+                                            {item.checked ? (
+                                                <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0" />
+                                            ) : (
+                                                <Circle size={18} className="text-text-muted/30 flex-shrink-0" />
+                                            )}
+                                            <span className={`text-sm font-bold ${item.checked ? 'line-through text-text-muted' : 'text-foreground'}`}>
+                                                {item.text}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Attachments Card */}
+                        {attachments.length > 0 && (
+                            <div className="bg-card-bg border border-card-border rounded-3xl p-6 md:p-8 shadow-sm">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-8 h-8 rounded-xl bg-brand-gold/10 flex items-center justify-center text-brand-gold border border-brand-gold/20">
+                                        <Paperclip size={16} />
+                                    </div>
+                                    <h2 className="text-sm font-black uppercase tracking-widest text-foreground">Attachments & Images</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {attachments.map((file) => (
+                                        <a
+                                            key={file.id}
+                                            href={file.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group flex items-center gap-3 p-3 rounded-xl border border-card-border bg-background hover:border-brand-gold/30 transition-all"
+                                        >
+                                            <div className="w-10 h-10 rounded-lg bg-card-bg flex items-center justify-center text-brand-gold border border-card-border overflow-hidden flex-shrink-0">
+                                                {file.type?.startsWith('image/') ? (
+                                                    <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <FileText size={18} />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold text-foreground truncate">{file.name}</p>
+                                                <span className="text-[10px] font-black text-brand-gold uppercase tracking-widest flex items-center gap-1">
+                                                    View File <ExternalLink size={8} />
+                                                </span>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Comments Section */}
                         <div className="bg-card-bg border border-card-border rounded-3xl p-6 md:p-8 shadow-sm">
