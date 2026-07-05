@@ -6,8 +6,19 @@ import { X, Calendar, User, AlignLeft, Tag, Flag, Trash2, Send, Clock } from 'lu
 import { TASK_STATUSES, TASK_TYPES, TASK_PRIORITIES } from '@/constants/taskConstants';
 import { useTasks } from '@/context/TasksContext';
 import { useAppContext } from '@/context/AppContext';
-import CommentsSection from './CommentsSection';
 import { format } from 'date-fns';
+import TaskChecklist from './TaskChecklist';
+import TaskAttachments from './TaskAttachments';
+import CommentsSection from './CommentsSection';
+
+const parseJSON = (str, fallback) => {
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return fallback;
+    }
+};
 
 export default function TaskModal({ task, onClose }) {
     const isNew = !task?.id;
@@ -23,18 +34,31 @@ export default function TaskModal({ task, onClose }) {
         priority: task?.priority || 'medium',
         assignee: task?.assignee || '',
         dueDate: task?.dueDate || '',
+        checklist: parseJSON(task?.checklist, []),
+        attachments: parseJSON(task?.attachments, []),
     });
 
+    const [activeTab, setActiveTab] = useState('details');
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e?.preventDefault?.();
+        if (!formData.title.trim()) {
+            setActiveTab('details');
+            return;
+        }
         setIsSaving(true);
         try {
+            const payload = {
+                ...formData,
+                checklist: JSON.stringify(formData.checklist),
+                attachments: JSON.stringify(formData.attachments),
+            };
+
             if (isNew) {
-                await addTask(formData);
+                await addTask(payload);
             } else {
-                await updateTask(task.id, formData);
+                await updateTask(task.id, payload);
             }
             onClose();
         } catch (error) {
@@ -90,34 +114,86 @@ export default function TaskModal({ task, onClose }) {
                 <div className="flex-1 overflow-y-auto flex flex-col md:flex-row">
                     {/* Main Content Area */}
                     <div className="flex-1 p-5 md:p-8 border-r border-card-border">
-                        <form id="task-form" onSubmit={handleSubmit} className="space-y-6">
-                            <div>
-                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1">Task Title</label>
-                                <input 
-                                    required
-                                    type="text" 
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                    placeholder="What needs to be done?"
-                                    className="w-full text-xl md:text-2xl font-bold text-foreground placeholder:text-text-muted/30 bg-transparent border-none p-0 focus:ring-0"
+                        <div className="mb-8 overflow-x-auto scrollbar-hide">
+                            <div className="flex items-center gap-1 p-1 bg-accent-slate/50 rounded-2xl w-max">
+                                {[
+                                    { id: 'details', label: 'Details' },
+                                    { id: 'checklist', label: 'Checklist', count: formData.checklist.length },
+                                    { id: 'files', label: 'Files', count: formData.attachments.length },
+                                    { id: 'comments', label: 'Comments', hide: isNew }
+                                ].filter(t => !t.hide).map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                                            activeTab === tab.id 
+                                            ? 'bg-brand-gold text-black shadow-lg shadow-brand-gold/20' 
+                                            : 'text-text-muted hover:text-foreground hover:bg-white/5'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                        {tab.count > 0 && (
+                                            <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-black/20' : 'bg-white/10'}`}>
+                                                {tab.count}
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {activeTab === 'details' && (
+                            <form id="task-form" onSubmit={handleSubmit} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div>
+                                    <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1">Task Title</label>
+                                    <input 
+                                        required
+                                        type="text" 
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                        placeholder="What needs to be done?"
+                                        className="w-full text-xl md:text-2xl font-bold text-foreground placeholder:text-text-muted/30 bg-transparent border-none p-0 focus:ring-0"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1 flex items-center gap-2">
+                                        <AlignLeft size={12} /> Description
+                                    </label>
+                                    <textarea 
+                                        rows={6}
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                        placeholder="Add more details about this task..."
+                                        className="w-full bg-accent-slate/50 border border-card-border rounded-2xl p-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all"
+                                    />
+                                </div>
+                            </form>
+                        )}
+
+                        {activeTab === 'checklist' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <TaskChecklist 
+                                    items={formData.checklist} 
+                                    onChange={(newList) => setFormData({...formData, checklist: newList})} 
                                 />
                             </div>
+                        )}
 
-                            <div>
-                                <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2 ml-1 flex items-center gap-2">
-                                    <AlignLeft size={12} /> Description
-                                </label>
-                                <textarea 
-                                    rows={4}
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                                    placeholder="Add more details about this task..."
-                                    className="w-full bg-accent-slate/50 border border-card-border rounded-2xl p-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all"
+                        {activeTab === 'files' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <TaskAttachments 
+                                    attachments={formData.attachments} 
+                                    onChange={(newFiles) => setFormData({...formData, attachments: newFiles})} 
                                 />
                             </div>
-                        </form>
+                        )}
 
-                        {!isNew && <CommentsSection taskId={task.id} />}
+                        {activeTab === 'comments' && !isNew && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <CommentsSection taskId={task.id} />
+                            </div>
+                        )}
                     </div>
 
                     {/* Sidebar Area */}
@@ -214,8 +290,9 @@ export default function TaskModal({ task, onClose }) {
                     >
                         Cancel
                     </button>
-                    <button 
-                        form="task-form"
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
                         disabled={isSaving}
                         className="flex items-center gap-2 bg-brand-gold text-black px-6 md:px-8 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
                     >
