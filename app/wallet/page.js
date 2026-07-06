@@ -6,7 +6,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import Loader from '@/components/Loader';
+import Dropdown from '@/components/ui/Dropdown';
 import {
     Search, X, Plus, TrendingUp, TrendingDown, Landmark,
     Wallet as WalletIcon, SlidersHorizontal, CalendarDays, User2
@@ -36,11 +38,12 @@ function TxFormFields({ formData, setFormData, members }) {
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributor</label>
-                    <select value={formData.memberId} onChange={e => setFormData(p => ({ ...p, memberId: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                        <option value="">General</option>
-                        {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                    </select>
+                    <Dropdown
+                        value={formData.memberId}
+                        onChange={value => setFormData(p => ({ ...p, memberId: value }))}
+                        options={[{ value: '', label: 'General' }, ...members.map(m => ({ value: m.id, label: m.name }))]}
+                        placeholder="Select contributor"
+                    />
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -52,12 +55,16 @@ function TxFormFields({ formData, setFormData, members }) {
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Type</label>
-                    <select value={formData.type} onChange={e => setFormData(p => ({ ...p, type: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                        <option value="income">Business Income</option>
-                        <option value="expense">Business Expense</option>
-                        <option value="capital">Capital Contribution</option>
-                    </select>
+                    <Dropdown
+                        value={formData.type}
+                        onChange={value => setFormData(p => ({ ...p, type: value }))}
+                        options={[
+                            { value: 'income', label: 'Business Income' },
+                            { value: 'expense', label: 'Business Expense' },
+                            { value: 'capital', label: 'Capital Contribution' },
+                        ]}
+                        placeholder="Select type"
+                    />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date</label>
@@ -80,6 +87,7 @@ export default function Wallet() {
     const [isSaving, setIsSaving]       = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [confirmConfig, setConfirmConfig] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
 
     // filters
@@ -145,11 +153,16 @@ export default function Wallet() {
         finally { setIsSaving(false); }
     };
 
-    const handleDelete = async (tx) => {
-        if (confirm(`Delete "${tx.description}"?`)) {
-            try { await deleteRecord('Transactions', tx.id); }
-            catch (err) { alert('❌ ' + err.message); }
-        }
+    const handleDelete = (tx) => {
+        setConfirmConfig({
+            title: 'Delete transaction',
+            message: `Delete "${tx.description}"? This cannot be undone.`,
+            confirmLabel: 'Delete Transaction',
+            onConfirm: async () => {
+                try { await deleteRecord('Transactions', tx.id); setConfirmConfig(null); }
+                catch (err) { alert('❌ ' + err.message); }
+            },
+        });
     };
 
     const openEdit = (tx) => { setFormData({ ...tx }); setModalConfig({ isOpen: true, type: 'edit', data: tx }); };
@@ -317,12 +330,16 @@ export default function Wallet() {
                                     <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest flex items-center gap-1.5">
                                         <User2 size={11} /> Contributor
                                     </p>
-                                    <select value={memberFilter} onChange={e => setMemberFilter(e.target.value)}
-                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                                        <option value="all">All Members</option>
-                                        <option value="general">General (No Member)</option>
-                                        {data.members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                                    </select>
+                                    <Dropdown
+                                        value={memberFilter}
+                                        onChange={setMemberFilter}
+                                        options={[
+                                            { value: 'all', label: 'All Members' },
+                                            { value: 'general', label: 'General (No Member)' },
+                                            ...data.members.map(m => ({ value: m.id, label: m.name })),
+                                        ]}
+                                        placeholder="Filter member"
+                                    />
                                 </div>
 
                                 {/* Date from */}
@@ -491,6 +508,15 @@ export default function Wallet() {
                     </div>
                 )}
             </div>
+
+            <ConfirmDialog
+                isOpen={!!confirmConfig}
+                title={confirmConfig?.title}
+                message={confirmConfig?.message}
+                confirmLabel={confirmConfig?.confirmLabel}
+                onCancel={() => setConfirmConfig(null)}
+                onConfirm={confirmConfig?.onConfirm}
+            />
 
             {/* Modals */}
             <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}

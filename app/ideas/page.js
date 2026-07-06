@@ -5,7 +5,9 @@ import { useAppContext } from '@/context/AppContext';
 import { Lightbulb, Plus, X, Star, Tag, User } from 'lucide-react';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import Loader from '@/components/Loader';
+import Dropdown from '@/components/ui/Dropdown';
 
 const INITIAL_FORM_DATA = {
     title: '',
@@ -54,10 +56,12 @@ const IdeaFormFields = ({ formData, setFormData }) => (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Category</label>
-                <select value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
+                <Dropdown
+                    value={formData.category}
+                    onChange={value => setFormData(p => ({ ...p, category: value }))}
+                    options={CATEGORIES}
+                    placeholder="Select category"
+                />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Tags</label>
@@ -79,6 +83,7 @@ export default function Ideas() {
     const [formData, setFormData] = useState(INITIAL_FORM_DATA);
     const [isSaving, setIsSaving] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [confirmConfig, setConfirmConfig] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All');
 
     const categories = useMemo(() => {
@@ -112,11 +117,16 @@ export default function Ideas() {
         }
     };
 
-    const handleDelete = async (idea) => {
-        if (confirm(`Delete "${idea.title}"?`)) {
-            try { await deleteRecord('Ideas', idea.id); }
-            catch (err) { alert('❌ ' + err.message); }
-        }
+    const handleDelete = (idea) => {
+        setConfirmConfig({
+            title: 'Delete idea',
+            message: `Delete "${idea.title}"? This cannot be undone.`,
+            confirmLabel: 'Delete Idea',
+            onConfirm: async () => {
+                try { await deleteRecord('Ideas', idea.id); setConfirmConfig(null); }
+                catch (err) { alert('❌ ' + err.message); }
+            },
+        });
     };
 
     const openEdit = (idea) => {
@@ -256,6 +266,15 @@ export default function Ideas() {
                     ))}
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!confirmConfig}
+                title={confirmConfig?.title}
+                message={confirmConfig?.message}
+                confirmLabel={confirmConfig?.confirmLabel}
+                onCancel={() => setConfirmConfig(null)}
+                onConfirm={confirmConfig?.onConfirm}
+            />
 
             {/* Modals */}
             <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}

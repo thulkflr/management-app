@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import Loader from '@/components/Loader';
+import Dropdown from '@/components/ui/Dropdown';
 import { FolderKanban, Camera, CalendarDays, User2, Plus, X } from 'lucide-react';
 
 const INITIAL_FORM_DATA = {
@@ -49,19 +51,25 @@ const FormFields = ({ formData, setFormData }) => (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Category</label>
-                <select value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
+                <Dropdown
+                    value={formData.category}
+                    onChange={value => setFormData(p => ({ ...p, category: value }))}
+                    options={CATEGORIES}
+                    placeholder="Select category"
+                />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Status</label>
-                <select value={formData.status} onChange={e => setFormData(p => ({ ...p, status: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold">
-                    <option value="planned">Planned</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                </select>
+                <Dropdown
+                    value={formData.status}
+                    onChange={value => setFormData(p => ({ ...p, status: value }))}
+                    options={[
+                        { value: 'planned', label: 'Planned' },
+                        { value: 'in_progress', label: 'In Progress' },
+                        { value: 'completed', label: 'Completed' },
+                    ]}
+                    placeholder="Select status"
+                />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date & Time</label>
@@ -79,6 +87,7 @@ export default function Projects() {
     const [isSaving, setIsSaving] = useState(false);
     const [statusFilter, setStatusFilter] = useState('all');
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [confirmConfig, setConfirmConfig] = useState(null);
 
     const stats = useMemo(() => ({
         total: data.projects.length,
@@ -111,11 +120,16 @@ export default function Projects() {
         }
     };
 
-    const handleDelete = async (project) => {
-        if (confirm(`Delete "${project.title}"?`)) {
-            try { await deleteRecord('Projects', project.id); }
-            catch (err) { alert('❌ ' + err.message); }
-        }
+    const handleDelete = (project) => {
+        setConfirmConfig({
+            title: 'Delete project',
+            message: `Delete "${project.title}"? This cannot be undone.`,
+            confirmLabel: 'Delete Project',
+            onConfirm: async () => {
+                try { await deleteRecord('Projects', project.id); setConfirmConfig(null); }
+                catch (err) { alert('❌ ' + err.message); }
+            },
+        });
     };
 
     const openEdit = (project) => {
@@ -261,6 +275,15 @@ export default function Projects() {
                     })}
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!confirmConfig}
+                title={confirmConfig?.title}
+                message={confirmConfig?.message}
+                confirmLabel={confirmConfig?.confirmLabel}
+                onCancel={() => setConfirmConfig(null)}
+                onConfirm={confirmConfig?.onConfirm}
+            />
 
             {/* Modals */}
             <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}

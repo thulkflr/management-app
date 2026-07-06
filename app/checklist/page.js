@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import Loader from '@/components/Loader';
 import {
     CheckCircle2, Circle, ListChecks, RefreshCcw, Plus, ChevronDown,
@@ -34,6 +35,7 @@ export default function ChecklistPage() {
 
     // Edit modal
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [confirmConfig, setConfirmConfig] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', category: '', quantity: 1, notes: '' });
 
     const allItems = useMemo(() => {
@@ -83,15 +85,22 @@ export default function ChecklistPage() {
             setPendingSections(p => p.filter(s => s !== section));
             return;
         }
-        if (!confirm(`Delete "${section}" and its ${items.length} item${items.length !== 1 ? 's' : ''}?`)) return;
-        setIsSaving(true);
-        try {
-            for (const item of items) {
-                await deleteRecord('Checklist', item.id, { reload: false, optimistic: true });
-            }
-            setPendingSections(p => p.filter(s => s !== section));
-        } catch (err) { alert('❌ ' + err.message); }
-        finally { setIsSaving(false); }
+        setConfirmConfig({
+            title: 'Delete section',
+            message: `Delete "${section}" and its ${items.length} item${items.length !== 1 ? 's' : ''}? This cannot be undone.`,
+            confirmLabel: 'Delete Section',
+            onConfirm: async () => {
+                setIsSaving(true);
+                try {
+                    for (const item of items) {
+                        await deleteRecord('Checklist', item.id, { reload: false, optimistic: true });
+                    }
+                    setPendingSections(p => p.filter(s => s !== section));
+                    setConfirmConfig(null);
+                } catch (err) { alert('❌ ' + err.message); }
+                finally { setIsSaving(false); }
+            },
+        });
     };
 
     const startRename = (section) => { setRenamingSection(section); setRenameValue(section); };
@@ -155,10 +164,15 @@ export default function ChecklistPage() {
     };
 
     const handleDeleteItem = async (item) => {
-        if (confirm(`Delete "${item.name}"?`)) {
-            try { await deleteRecord('Checklist', item.id, { reload: false, optimistic: true }); }
-            catch (err) { alert('❌ ' + err.message); }
-        }
+        setConfirmConfig({
+            title: 'Delete checklist item',
+            message: `Delete "${item.name}"? This cannot be undone.`,
+            confirmLabel: 'Delete Item',
+            onConfirm: async () => {
+                try { await deleteRecord('Checklist', item.id, { reload: false, optimistic: true }); setConfirmConfig(null); }
+                catch (err) { alert('❌ ' + err.message); }
+            },
+        });
     };
 
     const openEdit = (item) => {
@@ -185,15 +199,23 @@ export default function ChecklistPage() {
     const markAll = async (packed) => {
         const list = Array.isArray(data.checklist) ? data.checklist : [];
         if (list.length === 0) return;
-        if (!confirm(packed ? 'Mark ALL items as packed?' : 'Reset ALL items to unpacked?')) return;
-        setIsSaving(true);
-        try {
-            for (const item of list) {
-                if (normalizeBool(item.isPacked) === packed) continue;
-                await updateRecord('Checklist', item.id, { isPacked: packed, updatedAt: new Date().toISOString() }, { reload: false, optimistic: true });
-            }
-        } catch (err) { alert('❌ ' + err.message); }
-        finally { setIsSaving(false); }
+        setConfirmConfig({
+            title: packed ? 'Mark all as packed' : 'Reset checklist',
+            message: packed ? 'Mark ALL items as packed?' : 'Reset ALL items to unpacked?',
+            confirmLabel: packed ? 'Mark Packed' : 'Reset Items',
+            variant: 'warning',
+            onConfirm: async () => {
+                setIsSaving(true);
+                try {
+                    for (const item of list) {
+                        if (normalizeBool(item.isPacked) === packed) continue;
+                        await updateRecord('Checklist', item.id, { isPacked: packed, updatedAt: new Date().toISOString() }, { reload: false, optimistic: true });
+                    }
+                    setConfirmConfig(null);
+                } catch (err) { alert('❌ ' + err.message); }
+                finally { setIsSaving(false); }
+            },
+        });
     };
 
     if (loading) return (
@@ -450,6 +472,16 @@ export default function ChecklistPage() {
                     </button>
                 )}
             </div>
+
+            <ConfirmDialog
+                isOpen={!!confirmConfig}
+                title={confirmConfig?.title}
+                message={confirmConfig?.message}
+                confirmLabel={confirmConfig?.confirmLabel}
+                variant={confirmConfig?.variant}
+                onCancel={() => setConfirmConfig(null)}
+                onConfirm={confirmConfig?.onConfirm}
+            />
 
             {/* Edit Modal */}
             <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}
