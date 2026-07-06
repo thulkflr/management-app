@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import NumberTicker from '@/components/ui/number-ticker';
+import { calculateProfits } from '@/services/profitCalculator';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } } };
@@ -378,6 +379,11 @@ function ChecklistProgress({ checklist }) {
 export default function Dashboard() {
     const { data, loading, totalIncome, totalExpenses, totalCapital, netProfit, remainingMoney } = useAppContext();
     const { data: session } = useSession();
+    const profitDistributions = useMemo(() => calculateProfits(data.members, netProfit), [data.members, netProfit]);
+    const profitByPartner = useMemo(() =>
+        profitDistributions.reduce((map, item) => ({ ...map, [item.partnerId]: item }), {}),
+        [profitDistributions]
+    );
 
     const greeting = (() => {
         const h = new Date().getHours();
@@ -495,7 +501,7 @@ export default function Dashboard() {
                         <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
                             <div>
                                 <h2 className="text-sm font-black text-foreground tracking-tight">Partner Distribution</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Equity-based profit share</p>
+                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Capital-based profit share</p>
                             </div>
                             <DollarSign size={14} className="text-foreground/20" />
                         </div>
@@ -504,8 +510,10 @@ export default function Dashboard() {
                                 <p className="text-center py-8 text-foreground/20 text-sm italic">No partners</p>
                             ) : (
                                 data.members.map(member => {
-                                    const share = netProfit * (Number(member.sharePercentage) / 100);
-                                    const isPos = share >= 0;
+                                    const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
+                                    const profitAmount = distribution.profit;
+                                    const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
+                                    const isPos = profitAmount >= 0;
                                     return (
                                         <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
                                             <div className="flex items-center gap-3">
@@ -514,11 +522,11 @@ export default function Dashboard() {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-bold text-foreground leading-none mb-0.5">{member.name}</p>
-                                                    <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{member.sharePercentage}% equity</p>
+                                                    <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{capitalPercentage}% capital</p>
                                                 </div>
                                             </div>
                                             <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {isPos ? '' : '-'}$<NumberTicker value={Math.abs(share)} decimals={2} duration={1} />
+                                                {isPos ? '' : '-'}$<NumberTicker value={Math.abs(profitAmount)} decimals={2} duration={1} />
                                             </p>
                                         </div>
                                     );
