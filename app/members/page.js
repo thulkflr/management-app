@@ -4,6 +4,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useState, useMemo } from 'react';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import Loader from '@/components/Loader';
 import { Users2, Plus, X, Mail, TrendingUp } from 'lucide-react';
 import { calculateProfits } from '@/services/profitCalculator';
@@ -46,6 +47,7 @@ export default function Members() {
     const [formData, setFormData] = useState(INITIAL_FORM);
     const [isSaving, setIsSaving] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
+    const [confirmConfig, setConfirmConfig] = useState(null);
 
     const profitDistributions = useMemo(() => calculateProfits(data.members, netProfit), [data.members, netProfit]);
     const profitByPartner = useMemo(() =>
@@ -76,11 +78,16 @@ export default function Members() {
         }
     };
 
-    const handleDelete = async (member) => {
-        if (confirm(`Delete ${member.name}?`)) {
-            try { await deleteRecord('Members', member.id); }
-            catch (err) { alert('❌ ' + err.message); }
-        }
+    const handleDelete = (member) => {
+        setConfirmConfig({
+            title: 'Delete member',
+            message: `Delete "${member.name}"? This cannot be undone.`,
+            confirmLabel: 'Delete Member',
+            onConfirm: async () => {
+                try { await deleteRecord('Members', member.id); setConfirmConfig(null); }
+                catch (err) { alert('❌ ' + err.message); }
+            },
+        });
     };
 
     const openEdit = (member) => {
@@ -223,6 +230,15 @@ export default function Members() {
                     </div>
                 )}
             </div>
+
+            <ConfirmDialog
+                isOpen={!!confirmConfig}
+                title={confirmConfig?.title}
+                message={confirmConfig?.message}
+                confirmLabel={confirmConfig?.confirmLabel}
+                onCancel={() => setConfirmConfig(null)}
+                onConfirm={confirmConfig?.onConfirm}
+            />
 
             {/* Modals */}
             <AppModal isOpen={modalConfig.isOpen} onClose={() => setModalConfig({ isOpen: false, type: null, data: null })}

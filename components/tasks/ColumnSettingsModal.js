@@ -6,6 +6,7 @@ import { X, Plus, Trash2, GripVertical, Palette, Check, Layers } from 'lucide-re
 import { useTasks } from '@/context/TasksContext';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Loader from '@/components/Loader';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 const PRESET_COLORS = [
     { value: 'bg-slate-500',   label: 'Slate'    },
@@ -32,6 +33,7 @@ export default function ColumnSettingsModal({ onClose }) {
     const [isSaving, setIsSaving]             = useState(false);
     const [newColumnName, setNewColumnName]   = useState('');
     const [activeColorPicker, setActiveColorPicker] = useState(null);
+    const [confirmConfig, setConfirmConfig] = useState(null);
     const pickerRef = useRef(null);
     const addInputRef = useRef(null);
 
@@ -84,24 +86,33 @@ export default function ColumnSettingsModal({ onClose }) {
 
     const handleDelete = async (id) => {
         if (localColumns.length <= 1) return alert('Board must have at least one stage.');
-        if (!confirm('Delete this stage?')) return;
-        try { await deleteColumn(id); } catch (err) { console.error(err); }
+        setConfirmConfig({
+            title: 'Delete stage',
+            message: 'Delete this stage? This cannot be undone.',
+            confirmLabel: 'Delete Stage',
+            onConfirm: async () => {
+                try { await deleteColumn(id); setConfirmConfig(null); } catch (err) { console.error(err); }
+            },
+        });
     };
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <>
+        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-6">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
+                className="absolute inset-0 bg-black/72 backdrop-blur-xl animate-in fade-in duration-200"
                 onClick={onClose}
             />
 
             {/* Panel */}
-            <div className="relative w-full sm:max-w-xl max-h-[92dvh] sm:max-h-[85vh] flex flex-col
-                bg-card-bg border border-card-border
-                rounded-t-[2rem] sm:rounded-[2rem]
-                shadow-2xl shadow-black/40
-                animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
+            <div className="relative w-full sm:max-w-2xl max-h-[92dvh] sm:max-h-[86vh] flex flex-col
+                bg-card-bg/95 backdrop-blur-2xl border border-white/10
+                rounded-t-[2rem] sm:rounded-[28px]
+                shadow-[0_32px_110px_rgba(0,0,0,0.62)]
+                animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 overflow-hidden">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/8 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/45 to-transparent" />
 
                 {/* Drag handle (mobile only) */}
                 <div className="sm:hidden flex justify-center pt-3 pb-1">
@@ -109,7 +120,7 @@ export default function ColumnSettingsModal({ onClose }) {
                 </div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 sm:px-7 py-4 sm:py-5 border-b border-card-border flex-shrink-0">
+                <div className="relative z-10 flex items-center justify-between px-5 sm:px-7 py-5 sm:py-6 border-b border-white/10 bg-white/[0.025] flex-shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
                             <Layers size={17} />
@@ -124,13 +135,13 @@ export default function ColumnSettingsModal({ onClose }) {
                         </div>
                     </div>
                     <button onClick={onClose}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center text-foreground/30 hover:text-foreground hover:bg-white/5 transition-all active:scale-90">
+                        className="w-9 h-9 rounded-2xl flex items-center justify-center text-foreground/45 hover:text-foreground hover:bg-white/8 border border-white/8 hover:border-white/15 transition-all active:scale-90">
                         <X size={18} />
                     </button>
                 </div>
 
                 {/* Stages list */}
-                <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 custom-scrollbar space-y-2">
+                <div className="relative z-10 flex-1 overflow-y-auto px-4 sm:px-6 py-5 custom-scrollbar space-y-2">
                     <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest px-1 mb-3">
                         {localColumns.length} Stage{localColumns.length !== 1 ? 's' : ''} — drag to reorder
                     </p>
@@ -147,8 +158,8 @@ export default function ColumnSettingsModal({ onClose }) {
                                                     {...provided.draggableProps}
                                                     className={`flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-3 rounded-2xl border transition-all ${
                                                         snapshot.isDragging
-                                                            ? 'bg-brand-gold/5 border-brand-gold/30 shadow-xl shadow-brand-gold/10 scale-[1.01]'
-                                                            : 'bg-background border-card-border hover:border-brand-gold/20'
+                                                            ? 'bg-brand-gold/8 border-brand-gold/35 shadow-xl shadow-brand-gold/10 scale-[1.01]'
+                                                            : 'bg-white/[0.035] border-white/10 hover:border-brand-gold/25 hover:bg-white/[0.055]'
                                                     }`}
                                                 >
                                                     {/* Drag handle */}
@@ -168,7 +179,7 @@ export default function ColumnSettingsModal({ onClose }) {
                                                         </button>
 
                                                         {activeColorPicker === col.id && (
-                                                            <div className="absolute left-0 top-full mt-2 z-[130] bg-card-bg border border-card-border rounded-2xl shadow-2xl shadow-black/30 p-3 w-52 animate-in slide-in-from-top-1 duration-150">
+                                                            <div className="absolute left-0 top-full mt-2 z-[130] bg-card-bg/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 p-3 w-52 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150">
                                                                 <p className="text-[8px] font-black text-foreground/30 uppercase tracking-widest mb-2 px-1">Pick a color</p>
                                                                 <div className="grid grid-cols-3 gap-1.5">
                                                                     {PRESET_COLORS.map(pc => (
@@ -223,7 +234,7 @@ export default function ColumnSettingsModal({ onClose }) {
                 </div>
 
                 {/* Add stage + footer */}
-                <div className="flex-shrink-0 border-t border-card-border px-4 sm:px-6 py-4 space-y-3">
+                <div className="relative z-10 flex-shrink-0 border-t border-white/10 bg-white/[0.025] px-4 sm:px-6 py-4 space-y-3">
                     {/* Add input row */}
                     <div className="flex gap-2">
                         <div className="relative flex-1">
@@ -235,13 +246,13 @@ export default function ColumnSettingsModal({ onClose }) {
                                 value={newColumnName}
                                 onChange={e => setNewColumnName(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAddColumn()}
-                                className="w-full pl-9 pr-3 py-3 rounded-xl border border-card-border bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold transition"
+                                className="w-full pl-9 pr-3 py-3 rounded-2xl border border-white/10 bg-background/70 focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold/50 outline-none text-sm font-bold transition placeholder:text-foreground/25"
                             />
                         </div>
                         <button
                             onClick={handleAddColumn}
                             disabled={isSaving || !newColumnName.trim()}
-                            className="px-5 py-3 rounded-xl bg-brand-gold text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-brand-gold/20 hover:opacity-90 active:scale-95 transition-all disabled:opacity-30 flex items-center gap-1.5 flex-shrink-0"
+                            className="px-5 py-3 rounded-2xl bg-gradient-to-br from-[#e4c34f] to-brand-gold text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-brand-gold/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-40 disabled:hover:translate-y-0 flex items-center gap-1.5 flex-shrink-0"
                         >
                             {isSaving ? <Loader size={14} /> : <Plus size={14} />}
                             Add
@@ -256,12 +267,21 @@ export default function ColumnSettingsModal({ onClose }) {
                         </div>
                         <button
                             onClick={onClose}
-                            className="px-6 py-2.5 rounded-xl bg-foreground text-background font-black text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all">
+                            className="px-6 py-2.5 rounded-2xl bg-white/7 border border-white/10 text-foreground font-black text-xs uppercase tracking-wider hover:bg-white/10 hover:border-white/15 active:scale-95 transition-all">
                             Done
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+        <ConfirmDialog
+            isOpen={!!confirmConfig}
+            title={confirmConfig?.title}
+            message={confirmConfig?.message}
+            confirmLabel={confirmConfig?.confirmLabel}
+            onCancel={() => setConfirmConfig(null)}
+            onConfirm={confirmConfig?.onConfirm}
+        />
+        </>
     );
 }
