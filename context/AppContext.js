@@ -2,6 +2,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { withTotalInvestedAmounts } from '@/services/profitCalculator';
 
 const AppContext = createContext();
 
@@ -42,8 +43,9 @@ export function AppProvider({ children }) {
                 ...tx,
                 memberId: tx.memberId || tx.numberId // Map both to memberId for app consistency
             }));
+            const membersWithInvestments = withTotalInvestedAmounts(members, transactions);
 
-            setData({ members, transactions, projects, ideas, checklist });
+            setData({ members: membersWithInvestments, transactions, projects, ideas, checklist });
         } catch (err) {
             console.error("Failed to load data", err);
             setError(err.message);

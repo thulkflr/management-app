@@ -6,8 +6,9 @@ import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
 import Loader from '@/components/Loader';
 import { Users2, Plus, X, Mail, TrendingUp } from 'lucide-react';
+import { calculateProfits } from '@/services/profitCalculator';
 
-const INITIAL_FORM = { name: '', role: '', email: '', sharePercentage: '' };
+const INITIAL_FORM = { name: '', role: '', email: '' };
 
 const ROLES = ['Photographer', 'Videographer', 'Editor', 'Assistant', 'Manager', 'Partner'];
 
@@ -29,19 +30,11 @@ function MemberForm({ formData, setFormData }) {
                     <datalist id="roles-list">{ROLES.map(r => <option key={r} value={r} />)}</datalist>
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Email</label>
-                    <input type="email" placeholder="member@example.com"
-                        value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Profit Share %</label>
-                    <input required type="number" min="0" max="100" step="0.1" placeholder="e.g. 25"
-                        value={formData.sharePercentage} onChange={e => setFormData(p => ({ ...p, sharePercentage: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
-                </div>
+            <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Email</label>
+                <input type="email" placeholder="member@example.com"
+                    value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
             </div>
         </div>
     );
@@ -54,8 +47,13 @@ export default function Members() {
     const [isSaving, setIsSaving] = useState(false);
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, data: null });
 
-    const totalShare = useMemo(() =>
-        data.members.reduce((sum, m) => sum + Number(m.sharePercentage || 0), 0),
+    const profitDistributions = useMemo(() => calculateProfits(data.members, netProfit), [data.members, netProfit]);
+    const profitByPartner = useMemo(() =>
+        profitDistributions.reduce((map, item) => ({ ...map, [item.partnerId]: item }), {}),
+        [profitDistributions]
+    );
+    const totalInvestedCapital = useMemo(() =>
+        data.members.reduce((sum, m) => sum + Number(m.totalInvestedAmount || 0), 0),
         [data.members]
     );
 
@@ -86,7 +84,7 @@ export default function Members() {
     };
 
     const openEdit = (member) => {
-        setFormData({ name: member.name || '', role: member.role || '', email: member.email || '', sharePercentage: member.sharePercentage || '' });
+        setFormData({ name: member.name || '', role: member.role || '', email: member.email || '' });
         setModalConfig({ isOpen: true, type: 'edit', data: member });
     };
 
@@ -115,7 +113,7 @@ export default function Members() {
                             Team <span className="text-brand-gold italic">Members</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
-                            {data.members.length} members · {totalShare}% total share allocated
+                            {data.members.length} members · ${totalInvestedCapital.toLocaleString()} invested capital
                         </p>
                     </div>
                     <button
@@ -154,8 +152,8 @@ export default function Members() {
                         </div>
                         <div className="w-px bg-card-border" />
                         <div>
-                            <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Share Allocated</p>
-                            <p className={`text-xl font-black ${totalShare > 100 ? 'text-red-400' : totalShare === 100 ? 'text-emerald-400' : 'text-foreground'}`}>{totalShare}%</p>
+                            <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Capital Invested</p>
+                            <p className="text-xl font-black text-foreground">${totalInvestedCapital.toLocaleString()}</p>
                         </div>
                     </div>
                 )}
@@ -165,16 +163,17 @@ export default function Members() {
                     <div className="py-28 bg-card-bg rounded-3xl border border-dashed border-card-border text-center text-foreground/30">
                         <Users2 size={40} className="mx-auto mb-3 opacity-20" />
                         <p className="font-black uppercase tracking-widest text-sm">No members yet</p>
-                        <p className="text-xs mt-1 font-medium">Add team members to track roles and profit shares.</p>
+                        <p className="text-xs mt-1 font-medium">Add team members to track roles and invested capital.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {data.members.map(member => {
-                            const share = Number(member.sharePercentage || 0);
-                            const amount = (Number(netProfit || 0) * share / 100);
+                            const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
+                            const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
+                            const profitAmount = distribution.profit;
                             return (
                                 <div key={member.id} className="bg-card-bg rounded-3xl border border-card-border hover:border-brand-gold/25 hover:shadow-xl hover:shadow-brand-gold/5 transition-all duration-300 overflow-hidden group flex flex-col">
-                                    <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, var(--brand-gold) ${share}%, transparent ${share}%)`, opacity: 0.5 }} />
+                                    <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, var(--brand-gold) ${capitalPercentage}%, transparent ${capitalPercentage}%)`, opacity: 0.5 }} />
                                     <div className="p-5 flex flex-col flex-1">
                                         {/* Avatar + Name */}
                                         <div className="flex items-center gap-4 mb-4">
@@ -197,10 +196,10 @@ export default function Members() {
                                         <div className="space-y-1.5 mb-4">
                                             <div className="flex justify-between items-center">
                                                 <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest">Profit Share</p>
-                                                <span className="text-xs font-black text-brand-gold">{share}%</span>
+                                                <span className="text-xs font-black text-brand-gold">{capitalPercentage}%</span>
                                             </div>
                                             <div className="h-1.5 rounded-full bg-background border border-card-border overflow-hidden">
-                                                <div className="h-full bg-brand-gold rounded-full transition-all duration-500" style={{ width: `${Math.min(share, 100)}%` }} />
+                                                <div className="h-full bg-brand-gold rounded-full transition-all duration-500" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
                                             </div>
                                         </div>
 
@@ -209,9 +208,9 @@ export default function Members() {
                                             <div>
                                                 <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mb-0.5">Balance</p>
                                                 <div className="flex items-center gap-1.5">
-                                                    <TrendingUp size={12} className={amount >= 0 ? 'text-emerald-500' : 'text-red-400'} />
-                                                    <p className={`font-black text-base ${amount >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
-                                                        ${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                    <TrendingUp size={12} className={profitAmount >= 0 ? 'text-emerald-500' : 'text-red-400'} />
+                                                    <p className={`font-black text-base ${profitAmount >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
+                                                        ${profitAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -239,8 +238,9 @@ export default function Members() {
                     </form>
                 ) : modalConfig.data && (() => {
                     const m = modalConfig.data;
-                    const share = Number(m.sharePercentage || 0);
-                    const amount = (Number(netProfit || 0) * share / 100);
+                    const distribution = profitByPartner[m.id] || { percentage: 0, profit: 0 };
+                    const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
+                    const profitAmount = distribution.profit;
                     return (
                         <div className="space-y-5">
                             <div className="flex items-center gap-4 pb-5 border-b border-card-border">
@@ -261,15 +261,15 @@ export default function Members() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Profit Share</p>
-                                    <p className="text-2xl font-black text-brand-gold">{share}%</p>
+                                    <p className="text-2xl font-black text-brand-gold">{capitalPercentage}%</p>
                                     <div className="mt-2 h-1 rounded-full bg-background border border-card-border overflow-hidden">
-                                        <div className="h-full bg-brand-gold" style={{ width: `${Math.min(share, 100)}%` }} />
+                                        <div className="h-full bg-brand-gold" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
                                     </div>
                                 </div>
                                 <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Estimated Balance</p>
-                                    <p className={`text-2xl font-black ${amount >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
-                                        ${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                    <p className={`text-2xl font-black ${profitAmount >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
+                                        ${profitAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                             </div>
