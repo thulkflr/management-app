@@ -10,8 +10,8 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); 
 
-    const isAdmin = session.user.role === 'Admin';
-    if (!isAdmin && type === 'Wallet') {
+    const isAdmin = session.user?.role === 'Admin';
+    if (!isAdmin && (type === 'Members' || type === 'Transactions' || type === 'Wallet')) {
         return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }
 
@@ -30,8 +30,8 @@ export async function POST(request) {
     try {
         const { type, payload, hints } = await request.json();
 
-        const isAdmin = session.user.role === 'Admin';
-        if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
+        const isAdmin = session.user?.role === 'Admin';
+        if (!isAdmin && (type === 'Members' || type === 'Transactions' || type === 'Wallet')) {
             return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
         }
 
@@ -54,8 +54,8 @@ export async function PATCH(request) {
     try {
         const { type, id, payload, originalTask, hints } = await request.json();
 
-        const isAdmin = session.user.role === 'Admin';
-        if (!isAdmin && (type === 'Members' || type === 'Wallet')) {
+        const isAdmin = session.user?.role === 'Admin';
+        if (!isAdmin && (type === 'Members' || type === 'Transactions' || type === 'Wallet')) {
             return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
         }
 
@@ -76,7 +76,7 @@ export async function DELETE(request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // RBAC: Only Admins can delete anything
-    const isAdmin = session.user.role === 'Admin';
+    const isAdmin = session.user?.role === 'Admin';
     if (!isAdmin) {
         return NextResponse.json({ error: "Forbidden: Admin access required to delete" }, { status: 403 });
     }

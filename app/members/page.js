@@ -1,7 +1,9 @@
 // app/members/page.js
 'use client';
 import { useAppContext } from '@/context/AppContext';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import ActionButtons from '@/components/ActionButtons';
 import AppModal from '@/components/AppModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -42,7 +44,16 @@ function MemberForm({ formData, setFormData }) {
 }
 
 export default function Members() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const { data, loading, addRecord, updateRecord, deleteRecord, netProfit } = useAppContext();
+
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user?.role !== 'Admin') {
+            router.replace('/?denied=members');
+        }
+    }, [status, session, router]);
+
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState(INITIAL_FORM);
     const [isSaving, setIsSaving] = useState(false);
@@ -96,6 +107,9 @@ export default function Members() {
     };
 
     const openView = (member) => setModalConfig({ isOpen: true, type: 'view', data: member });
+
+    if (status === 'loading') return null;
+    if (status === 'authenticated' && session?.user?.role !== 'Admin') return null;
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
