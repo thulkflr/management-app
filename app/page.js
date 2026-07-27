@@ -2,10 +2,12 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import {
     TrendingUp, TrendingDown, DollarSign, Wallet, BarChart3,
     ArrowUpRight, ArrowDownRight, Lightbulb, FolderKanban,
-    Users, Clock, CheckSquare,
+    Users, Clock, CheckSquare, Camera, Calendar, Sparkles,
+    ArrowRight, Zap
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import NumberTicker from '@/components/ui/number-ticker';
@@ -17,6 +19,16 @@ const fadeUp = {
     hidden: { opacity: 0, y: 16, filter: 'blur(5px)' },
     show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.42, ease: [0.16, 1, 0.3, 1] } },
 };
+
+// ── Normalize Checklist Packed Status ─────────────────────────────────────────
+function normalizePacked(item) {
+    if (!item) return false;
+    const val = item.isPacked ?? item.completed ?? item.packed ?? item.status;
+    if (typeof val === 'boolean') return val;
+    if (val == null) return false;
+    const s = String(val).trim().toLowerCase();
+    return s === 'true' || s === 'yes' || s === '1' || s === 'packed' || s === 'done' || s === 'completed';
+}
 
 // ── Status color maps ───────────────────────────────────────────────────────
 const PROJECT_COLORS = {
@@ -35,134 +47,117 @@ const IDEA_COLORS = {
 const fallbackColor = '#c5a022';
 
 // ── GrowthChart (SVG) ───────────────────────────────────────────────────────
-// Uses CSS currentColor so labels adapt to both light/dark mode.
-function GrowthChart({ transactions }) {
+function GrowthChart({ transactions = [] }) {
     const months = useMemo(() => {
+        const rawTxs = Array.isArray(transactions) ? transactions : [];
+        const now = new Date();
         const map = {};
-        transactions.forEach(tx => {
-            if (!tx.date) return;
+
+        // Pre-fill the last 6 calendar months (including current month)
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+            const fullLabel = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            map[key] = { key, label, fullLabel, income: 0, expense: 0 };
+        }
+
+        // Fill transaction totals
+        rawTxs.forEach(tx => {
+            if (!tx || !tx.date) return;
             const d = new Date(tx.date);
             if (isNaN(d.getTime())) return;
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (!map[key]) map[key] = { income: 0, expense: 0 };
-            const amt = Math.abs(Number(tx.amount) || 0);
-            if (tx.type === 'income')  map[key].income  += amt;
-            if (tx.type === 'expense') map[key].expense += amt;
+            if (map[key]) {
+                const amt = Math.abs(Number(String(tx.amount).replace(/[^0-9.-]+/g, '')) || 0);
+                if (tx.type === 'income')  map[key].income  += amt;
+                if (tx.type === 'expense') map[key].expense += amt;
+            }
         });
-        return Object.entries(map)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .slice(-6)
-            .map(([key, v]) => ({
-                label: new Date(key + '-01').toLocaleDateString('en', { month: 'short', year: '2-digit' }),
-                fullLabel: new Date(key + '-01').toLocaleDateString('en', { month: 'long', year: 'numeric' }),
-                income: v.income,
-                expense: v.expense,
-            }));
+
+        return Object.values(map);
     }, [transactions]);
 
-    if (months.length === 0) return (
-        <div className="h-36 flex items-center justify-center text-foreground/20 text-sm italic">
-            No transaction data yet
-        </div>
-    );
+    const maxVal = Math.max(...months.flatMap(m => [m.income, m.expense]), 100);
 
-    const maxVal = Math.max(...months.flatMap(m => [m.income, m.expense]), 1);
-
-    // SVG dimensions
-    const W = 540, H = 200;
-    const PL = 52, PR = 12, PT = 16, PB = 40;
+    const W = 540, H = 210;
+    const PL = 55, PR = 15, PT = 22, PB = 40;
     const chartW = W - PL - PR;
     const chartH = H - PT - PB;
-    const xAxisY = PT + chartH;
 
     const colW = chartW / months.length;
-    const barW = Math.min(26, colW * 0.30);
-    const gap = 5;
+    const barW = Math.min(22, colW * 0.32);
 
     const barTop = (val) => PT + chartH - (val / maxVal) * chartH;
     const barHeight = (val) => (val / maxVal) * chartH;
     const fmt = (v) => v >= 1000 ? `$${(v / 1000).toFixed(1)}k` : `$${Math.round(v)}`;
 
-    // Y-axis grid ticks at 25/50/75/100%
     const gridPcts = [0.25, 0.5, 0.75, 1];
 
     return (
-        // color: var(--foreground) makes currentColor work for SVG text/lines
         <div style={{ color: 'var(--foreground)' }}>
             <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.95" />
+                        <stop offset="100%" stopColor="#059669" stopOpacity="0.7" />
+                    </linearGradient>
+                    <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ef4444" stopOpacity="0.95" />
+                        <stop offset="100%" stopColor="#dc2626" stopOpacity="0.7" />
+                    </linearGradient>
+                </defs>
+
                 <style>{`
-                    .gc-grid  { stroke: currentColor; opacity: 0.07; }
+                    .gc-grid  { stroke: currentColor; opacity: 0.08; }
                     .gc-axis  { stroke: currentColor; opacity: 0.15; }
-                    .gc-label { fill: currentColor; opacity: 0.35; font-family: inherit; }
-                    .gc-val   { fill: currentColor; opacity: 0.55; font-family: inherit; }
+                    .gc-label { fill: currentColor; opacity: 0.4; font-family: inherit; }
+                    .gc-val   { fill: currentColor; opacity: 0.75; font-family: inherit; }
                 `}</style>
 
-                {/* Y-axis grid lines + labels */}
-                {gridPcts.map(pct => {
-                    const lineY = PT + chartH * (1 - pct);
+                {gridPcts.map((pct) => {
+                    const y = PT + chartH * (1 - pct);
                     return (
                         <g key={pct}>
-                            <line x1={PL} y1={lineY} x2={W - PR} y2={lineY}
-                                className="gc-grid" strokeWidth="1" strokeDasharray="3 4" />
-                            <text x={PL - 6} y={lineY + 4} textAnchor="end"
-                                fontSize="9" className="gc-label">
+                            <line x1={PL} y1={y} x2={W - PR} y2={y} className="gc-grid" strokeDasharray="3 3" />
+                            <text x={PL - 6} y={y + 3} textAnchor="end" className="gc-label" fontSize="9" fontWeight="bold">
                                 {fmt(maxVal * pct)}
                             </text>
                         </g>
                     );
                 })}
 
-                {/* X-axis baseline */}
-                <line x1={PL} y1={xAxisY} x2={W - PR} y2={xAxisY}
-                    className="gc-axis" strokeWidth="1" />
+                <line x1={PL} y1={PT + chartH} x2={W - PR} y2={PT + chartH} className="gc-axis" strokeWidth="1" />
 
-                {/* Bars per month */}
-                {months.map((m, i) => {
-                    const cx = PL + i * colW + colW / 2;
-                    const incH  = barHeight(m.income);
-                    const expH  = barHeight(m.expense);
-                    const incTop = barTop(m.income);
-                    const expTop = barTop(m.expense);
+                {months.map((m, idx) => {
+                    const colX = PL + idx * colW;
+                    const incX = colX + colW / 2 - barW - 2;
+                    const expX = colX + colW / 2 + 2;
+
+                    const incH = barHeight(m.income);
+                    const incY = barTop(m.income);
+
+                    const expH = barHeight(m.expense);
+                    const expY = barTop(m.expense);
 
                     return (
-                        <g key={m.label}>
-                            {/* Income bar */}
-                            <rect
-                                x={cx - barW - gap / 2} y={incTop}
-                                width={barW} height={incH} rx="3"
-                                fill="#10b981" opacity="0.80"
-                            >
-                                <title>{m.fullLabel} · Income: {fmt(m.income)}</title>
-                            </rect>
+                        <g key={m.key} className="group/bar cursor-pointer">
+                            <rect x={colX} y={PT} width={colW} height={chartH} fill="transparent" />
 
-                            {/* Income value label (only if tall enough) */}
-                            {incH > 22 && (
-                                <text x={cx - barW / 2 - gap / 2} y={incTop - 5}
-                                    textAnchor="middle" fontSize="8" className="gc-val">
-                                    {fmt(m.income)}
-                                </text>
-                            )}
+                            {/* Income Bar */}
+                            <rect x={incX} y={incY} width={barW} height={Math.max(incH, 2)} rx="4" fill="url(#incomeGrad)" className="transition-all duration-200 group-hover/bar:brightness-125" />
+                            <text x={incX + barW / 2} y={Math.max(incY - 5, PT + 8)} textAnchor="middle" className="gc-val opacity-0 group-hover/bar:opacity-100 transition-opacity" fontSize="8" fontWeight="black">
+                                {m.income > 0 ? fmt(m.income) : ''}
+                            </text>
 
-                            {/* Expense bar */}
-                            <rect
-                                x={cx + gap / 2} y={expTop}
-                                width={barW} height={expH} rx="3"
-                                fill="#ef4444" opacity="0.72"
-                            >
-                                <title>{m.fullLabel} · Expenses: {fmt(m.expense)}</title>
-                            </rect>
+                            {/* Expense Bar */}
+                            <rect x={expX} y={expY} width={barW} height={Math.max(expH, 2)} rx="4" fill="url(#expenseGrad)" className="transition-all duration-200 group-hover/bar:brightness-125" />
+                            <text x={expX + barW / 2} y={Math.max(expY - 5, PT + 8)} textAnchor="middle" className="gc-val opacity-0 group-hover/bar:opacity-100 transition-opacity" fontSize="8" fontWeight="black">
+                                {m.expense > 0 ? fmt(m.expense) : ''}
+                            </text>
 
-                            {/* Expense value label */}
-                            {expH > 22 && (
-                                <text x={cx + barW / 2 + gap / 2} y={expTop - 5}
-                                    textAnchor="middle" fontSize="8" className="gc-val">
-                                    {fmt(m.expense)}
-                                </text>
-                            )}
-
-                            {/* Month label below x-axis */}
-                            <text x={cx} y={xAxisY + 16}
-                                textAnchor="middle" fontSize="9" className="gc-label">
+                            {/* Month Label */}
+                            <text x={colX + colW / 2} y={H - 10} textAnchor="middle" className="gc-label" fontSize="9.5" fontWeight="bold">
                                 {m.label}
                             </text>
                         </g>
@@ -173,143 +168,85 @@ function GrowthChart({ transactions }) {
     );
 }
 
-// ── RecentTransactions ──────────────────────────────────────────────────────
-function RecentTransactions({ transactions }) {
-    const recent = useMemo(() => (
-        [...transactions]
-            .filter(tx => tx.date || tx.description)
-            .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-            .slice(0, 5)
-    ), [transactions]);
-
-    const typeStyle = {
-        income:  { label: 'Income',  color: 'text-emerald-400', bg: 'bg-emerald-400/10', icon: ArrowUpRight },
-        expense: { label: 'Expense', color: 'text-red-400',     bg: 'bg-red-400/10',     icon: ArrowDownRight },
-        capital: { label: 'Capital', color: 'text-brand-gold',  bg: 'bg-brand-gold/10',  icon: DollarSign },
-    };
-
-    return (
-        <div className="space-y-1.5">
-            {recent.length === 0 && (
-                <p className="text-center py-8 text-foreground/20 text-sm italic">No transactions yet</p>
-            )}
-            {recent.map(tx => {
-                const s = typeStyle[tx.type] || typeStyle.expense;
-                const Icon = s.icon;
-                const d = tx.date ? new Date(tx.date) : null;
-                const dateStr = d && !isNaN(d) ? d.toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '';
-                return (
-                    <div key={tx.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${s.bg}`}>
-                            <Icon size={14} className={s.color} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[12px] font-bold text-foreground truncate">{tx.description || '—'}</p>
-                            <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest">{dateStr}</p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                            <p className={`text-sm font-black tabular ${s.color}`}>
-                                {tx.type === 'expense' ? '-' : '+'}${Number(tx.amount || 0).toLocaleString()}
-                            </p>
-                            <span className={`text-[8px] font-black uppercase tracking-wider ${s.color} opacity-60`}>{s.label}</span>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
-
-// ── RecentProjects ──────────────────────────────────────────────────────────
-function RecentProjects({ projects }) {
-    const recent = useMemo(() => [...projects].slice(-3).reverse(), [projects]);
-
-    // Compact status summary
-    const statusCounts = useMemo(() => {
+// ── Helper Widgets ──────────────────────────────────────────────────────────
+function StatusBreakdown({ items = [], colorMap = {}, emptyText = 'No data' }) {
+    const raw = Array.isArray(items) ? items : [];
+    const counts = useMemo(() => {
         const map = {};
-        projects.forEach(p => { const s = p.status || 'Unknown'; map[s] = (map[s] || 0) + 1; });
-        return Object.entries(map).sort(([, a], [, b]) => b - a).slice(0, 4);
-    }, [projects]);
-
-    if (projects.length === 0) return (
-        <p className="text-center py-8 text-foreground/20 text-xs italic">No projects yet</p>
-    );
-
-    return (
-        <div className="space-y-1.5">
-            {recent.map(project => {
-                const color = PROJECT_COLORS[project.status] || fallbackColor;
-                return (
-                    <div key={project.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-0.5" style={{ background: color }} />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-foreground truncate leading-snug">
-                                {project.title || 'Untitled'}
-                            </p>
-                            <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest truncate">
-                                {project.client || project.category || '—'}
-                            </p>
-                        </div>
-                        <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg flex-shrink-0"
-                            style={{ color, background: `${color}18` }}>
-                            {project.status || '?'}
-                        </span>
-                    </div>
-                );
-            })}
-
-            {/* Status summary pills */}
-            {statusCounts.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-card-border mt-1">
-                    {statusCounts.map(([status, count]) => (
-                        <span key={status} className="flex items-center gap-1.5 text-[8px] font-black text-foreground/30 uppercase tracking-widest">
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: PROJECT_COLORS[status] || fallbackColor }} />
-                            {count} {status}
-                        </span>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-// ── Ideas StatusBreakdown ───────────────────────────────────────────────────
-function StatusBreakdown({ items, colorMap, emptyText }) {
-    const groups = useMemo(() => {
-        const map = {};
-        items.forEach(item => {
-            const s = item.status || 'Unknown';
-            map[s] = (map[s] || 0) + 1;
+        raw.forEach(item => {
+            const st = item.status || item.category || 'Other';
+            map[st] = (map[st] || 0) + 1;
         });
-        return Object.entries(map).sort(([, a], [, b]) => b - a);
-    }, [items]);
+        return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    }, [raw]);
 
-    if (groups.length === 0) return (
-        <p className="text-center py-6 text-foreground/20 text-xs italic">{emptyText}</p>
-    );
+    const total = raw.length;
+    if (total === 0) return <p className="text-center py-8 text-foreground/20 text-sm italic">{emptyText}</p>;
 
-    const total = items.length;
     return (
         <div className="space-y-3">
-            {groups.map(([status, count]) => {
-                const color = colorMap[status] || fallbackColor;
-                const pct = Math.round((count / total) * 100);
-                return (
-                    <div key={status}>
-                        <div className="flex items-center justify-between mb-1.5">
+            <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-white/5 p-0.5 gap-0.5">
+                {counts.map(([status, count]) => {
+                    const color = colorMap[status] || fallbackColor;
+                    const pct = ((count / total) * 100).toFixed(1);
+                    return (
+                        <div key={status} style={{ width: `${pct}%`, backgroundColor: color }} className="h-full rounded-full transition-all duration-500 opacity-90 hover:opacity-100" title={`${status}: ${count} (${pct}%)`} />
+                    );
+                })}
+            </div>
+            <div className="space-y-2 pt-1">
+                {counts.map(([status, count]) => {
+                    const color = colorMap[status] || fallbackColor;
+                    const pct = Math.round((count / total) * 100);
+                    return (
+                        <div key={status} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
-                                <span className="text-[10px] font-black text-foreground/55 uppercase tracking-widest">{status}</span>
+                                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                                <span className="font-bold text-foreground/70">{status}</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-black text-foreground/40">{count}</span>
-                                <span className="text-[9px] font-black text-foreground/20">{pct}%</span>
+                            <div className="flex items-center gap-2 font-mono">
+                                <span className="font-black text-foreground">{count}</span>
+                                <span className="text-[10px] text-foreground/30 font-sans">({pct}%)</span>
                             </div>
                         </div>
-                        <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full transition-all duration-700"
-                                style={{ width: `${pct}%`, background: color, opacity: 0.8 }} />
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+function RecentTransactions({ transactions = [] }) {
+    const raw = Array.isArray(transactions) ? transactions : [];
+    const sorted = useMemo(() => {
+        return [...raw]
+            .filter(t => t && t.date)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5);
+    }, [raw]);
+
+    if (sorted.length === 0) return <p className="text-center py-8 text-foreground/20 text-sm italic">No transactions yet</p>;
+
+    return (
+        <div className="space-y-2">
+            {sorted.map(tx => {
+                const isIncome = tx.type === 'income';
+                const isCapital = tx.type === 'capital';
+                const amt = Math.abs(Number(String(tx.amount).replace(/[^0-9.-]+/g, '')) || 0);
+                return (
+                    <div key={tx.id || Math.random()} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
+                        <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-black text-xs ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : isCapital ? 'bg-brand-gold/10 text-brand-gold border border-brand-gold/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                {isIncome ? <ArrowUpRight size={14} /> : isCapital ? <Wallet size={14} /> : <ArrowDownRight size={14} />}
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-foreground leading-none mb-1 group-hover:text-brand-gold transition-colors">{tx.category || tx.description || 'Transaction'}</p>
+                                <p className="text-[9px] text-foreground/30 font-medium">{tx.date ? new Date(tx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—'}</p>
+                            </div>
                         </div>
+                        <span className={`text-xs font-black tabular ${isIncome ? 'text-emerald-400' : isCapital ? 'text-brand-gold' : 'text-foreground/70'}`}>
+                            {tx.type === 'expense' ? '-' : '+'}${amt.toLocaleString()}
+                        </span>
                     </div>
                 );
             })}
@@ -317,61 +254,210 @@ function StatusBreakdown({ items, colorMap, emptyText }) {
     );
 }
 
-// ── ChecklistProgress ───────────────────────────────────────────────────────
-function ChecklistProgress({ checklist }) {
-    const { total, packed, sections } = useMemo(() => {
-        const isPacked = (v) => v === true || v === 'true' || v === 'TRUE' || v === '1';
-        const sectionMap = {};
-        checklist.forEach(item => {
-            const sec = String(item.category || 'General').trim();
-            if (!sectionMap[sec]) sectionMap[sec] = { total: 0, packed: 0 };
-            sectionMap[sec].total++;
-            if (isPacked(item.isPacked)) sectionMap[sec].packed++;
-        });
-        const sections = Object.entries(sectionMap).sort(([, a], [, b]) => b.total - a.total).slice(0, 5);
-        const total = checklist.length;
-        const packed = checklist.filter(i => isPacked(i.isPacked)).length;
-        return { total, packed, sections };
-    }, [checklist]);
+function RecentProjects({ projects = [] }) {
+    const raw = Array.isArray(projects) ? projects : [];
+    const recent = useMemo(() => {
+        return [...raw]
+            .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+            .slice(0, 4);
+    }, [raw]);
 
-    const pct = total > 0 ? Math.round((packed / total) * 100) : 0;
+    if (recent.length === 0) return <p className="text-center py-8 text-foreground/20 text-sm italic">No projects yet</p>;
 
-    if (total === 0) return (
-        <p className="text-center py-6 text-foreground/20 text-xs italic">No checklist items yet</p>
+    return (
+        <div className="space-y-2.5">
+            {recent.map(p => {
+                const color = PROJECT_COLORS[p.status] || fallbackColor;
+                return (
+                    <div key={p.id || Math.random()} className="p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-brand-gold transition-colors">{p.title}</h4>
+                            <p className="text-[9px] text-foreground/35 font-medium mt-0.5">{p.category || 'General'}</p>
+                        </div>
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded border border-white/5 flex-shrink-0" style={{ color, backgroundColor: `${color}15` }}>
+                            {p.status || 'Active'}
+                        </span>
+                    </div>
+                );
+            })}
+        </div>
     );
+}
+
+function ChecklistProgress({ checklist = [] }) {
+    const raw = Array.isArray(checklist) ? checklist : [];
+    const total = raw.length;
+    const completed = useMemo(() => raw.filter(normalizePacked).length, [raw]);
+    const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
 
     return (
         <div className="space-y-4">
-            <div>
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Overall</span>
-                    <span className="text-[11px] font-black text-brand-gold tabular">{packed}/{total}</span>
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">Gear Checklist</p>
+                    <p className="text-xl font-black text-foreground tracking-tight mt-0.5">{completed} <span className="text-xs font-normal text-foreground/40">/ {total} items ready</span></p>
                 </div>
-                <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
-                    <motion.div className="h-full rounded-full"
-                        style={{ background: pct === 100 ? '#10b981' : 'var(--brand-gold)', opacity: 0.85 }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                    />
+                <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center font-black text-brand-gold text-sm shadow-inner">
+                    {pct}%
                 </div>
-                <p className="text-right text-[9px] font-black text-foreground/20 mt-1">{pct}% packed</p>
             </div>
-            {sections.map(([sec, { total: st, packed: sp }]) => {
-                const spct = Math.round((sp / st) * 100);
-                return (
-                    <div key={sec}>
-                        <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest truncate max-w-[65%]">{sec}</span>
-                            <span className="text-[9px] font-black text-foreground/25">{sp}/{st}</span>
+
+            <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden p-0.5 border border-white/5">
+                <div className="bg-gradient-to-r from-brand-gold/70 to-brand-gold h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+            </div>
+
+            <div className="space-y-2 pt-1">
+                {raw.length === 0 ? (
+                    <p className="text-center py-4 text-foreground/20 text-xs italic">No gear items added</p>
+                ) : (
+                    raw.slice(0, 4).map(item => {
+                        const isDone = normalizePacked(item);
+                        return (
+                            <div key={item.id || item.name} className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-background border border-card-border">
+                                <span className={`font-bold truncate max-w-[180px] ${isDone ? 'line-through text-foreground/30' : 'text-foreground/80'}`}>
+                                    {item.name || item.title || 'Gear Item'}
+                                </span>
+                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border flex-shrink-0 ${isDone ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                                    {isDone ? 'Packed' : 'Needed'}
+                                </span>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ── Dynamic Operational Components for Non-Admin Dashboard ───────────────────
+function UpcomingShootBanner({ projects = [] }) {
+    const raw = Array.isArray(projects) ? projects : [];
+    const upcoming = useMemo(() => {
+        if (raw.length === 0) return null;
+        const valid = raw.filter(p => p && p.date && p.status !== 'completed' && p.status !== 'Completed');
+        if (valid.length === 0) return null;
+        return [...valid].sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+    }, [raw]);
+
+    if (!upcoming) return null;
+
+    const shootDate = new Date(upcoming.date);
+    const isValid = shootDate instanceof Date && !isNaN(shootDate.getTime());
+    const dateFormatted = isValid
+        ? shootDate.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
+        : 'Scheduled';
+    const timeFormatted = isValid
+        ? shootDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        : '';
+
+    return (
+        <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-brand-gold/25 bg-gradient-to-br from-brand-gold/12 via-card-bg to-card-bg p-6 md:p-7 shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-brand-gold flex-shrink-0 shadow-lg shadow-brand-gold/10">
+                        <Camera size={24} />
+                    </div>
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2.5 py-0.5 rounded-full bg-brand-gold/15 text-brand-gold text-[9px] font-black uppercase tracking-widest border border-brand-gold/25">
+                                Next Scheduled Session
+                            </span>
+                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">
+                                {upcoming.category || 'General'}
+                            </span>
                         </div>
-                        <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full bg-brand-gold/60 transition-all duration-700" style={{ width: `${spct}%` }} />
+                        <h3 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
+                            {upcoming.title}
+                        </h3>
+                        <div className="flex items-center gap-4 text-xs font-bold text-foreground/60 pt-0.5 flex-wrap">
+                            <span className="flex items-center gap-1.5 text-brand-gold font-black">
+                                <Calendar size={13} /> {dateFormatted} {timeFormatted ? `at ${timeFormatted}` : ''}
+                            </span>
+                            {upcoming.createdBy && (
+                                <span className="flex items-center gap-1 text-foreground/40">
+                                    • Photographer: <strong className="text-foreground/80">{upcoming.createdBy}</strong>
+                                </span>
+                            )}
                         </div>
                     </div>
-                );
-            })}
-        </div>
+                </div>
+                <Link
+                    href="/projects"
+                    className="flex items-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.03] active:scale-95 transition-all self-stretch md:self-auto justify-center"
+                >
+                    View Projects <ArrowRight size={14} />
+                </Link>
+            </div>
+        </motion.div>
+    );
+}
+
+function QuickLaunchpad() {
+    const shortcuts = [
+        { label: 'Project Hub', desc: 'Active shoots & events', href: '/projects', icon: FolderKanban, color: 'text-brand-gold', bg: 'bg-brand-gold/10', border: 'border-brand-gold/20' },
+        { label: 'Creative Ideas', desc: 'Explore concept catalog', href: '/ideas', icon: Lightbulb, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' },
+        { label: 'Gear Checklist', desc: 'Equipment readiness', href: '/checklist', icon: CheckSquare, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
+        { label: 'Tasks Board', desc: 'Production workflow', href: '/tasks', icon: Zap, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
+    ];
+
+    return (
+        <motion.div variants={fadeUp} className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                    <Sparkles size={13} className="text-brand-gold" /> Studio Quick Launchpad
+                </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {shortcuts.map(sc => {
+                    const Icon = sc.icon;
+                    return (
+                        <Link key={sc.label} href={sc.href}
+                            className={`group p-4 rounded-2xl bg-card-bg border border-card-border hover:${sc.border} hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-3 relative overflow-hidden`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className={`w-9 h-9 rounded-xl ${sc.bg} border ${sc.border} flex items-center justify-center ${sc.color} group-hover:scale-110 transition-transform`}>
+                                    <Icon size={18} />
+                                </div>
+                                <ArrowUpRight size={14} className="text-foreground/20 group-hover:text-brand-gold group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-sm text-foreground group-hover:text-brand-gold transition-colors leading-tight">
+                                    {sc.label}
+                                </h3>
+                                <p className="text-[9px] font-bold text-foreground/35 mt-0.5 leading-snug">
+                                    {sc.desc}
+                                </p>
+                            </div>
+                        </Link>
+                    );
+                })}
+            </div>
+        </motion.div>
+    );
+}
+
+function StudioMotivationCard() {
+    const tips = [
+        "Use rim lighting and hair lights to separate black-attire subjects from dark backdrops.",
+        "Always format SD cards in-camera before starting any major graduation or wedding shoot.",
+        "Golden hour lighting is softest 30 minutes before sunset — plan your outdoor portraits accordingly.",
+        "Check battery levels & clear memory cards at least 2 hours before departing for a venue.",
+    ];
+    const randomTip = useMemo(() => tips[Math.floor(Math.random() * tips.length)], []);
+
+    return (
+        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border p-5 md:p-6 flex items-start gap-4 shadow-lg">
+            <div className="w-10 h-10 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                <Sparkles size={20} />
+            </div>
+            <div className="space-y-1">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-brand-gold">Studio Pro Tip & Focus</h4>
+                <p className="text-xs font-bold text-foreground/75 leading-relaxed italic">
+                    &quot;{randomTip}&quot;
+                </p>
+            </div>
+        </motion.div>
     );
 }
 
@@ -379,7 +465,9 @@ function ChecklistProgress({ checklist }) {
 export default function Dashboard() {
     const { data, loading, totalIncome, totalExpenses, totalCapital, netProfit, remainingMoney } = useAppContext();
     const { data: session } = useSession();
-    const profitDistributions = useMemo(() => calculateProfits(data.members, netProfit), [data.members, netProfit]);
+    const isAdmin = session?.user?.role === 'Admin';
+    const membersList = Array.isArray(data.members) ? data.members : [];
+    const profitDistributions = useMemo(() => calculateProfits(membersList, netProfit), [membersList, netProfit]);
     const profitByPartner = useMemo(() =>
         profitDistributions.reduce((map, item) => ({ ...map, [item.partnerId]: item }), {}),
         [profitDistributions]
@@ -394,12 +482,31 @@ export default function Dashboard() {
 
     const firstName = session?.user?.name?.split(' ')[0] ?? '';
 
+    // Non-Admin Operational KPIs
+    const operationalKpis = useMemo(() => {
+        const projectsList = Array.isArray(data.projects) ? data.projects : [];
+        const checklistList = Array.isArray(data.checklist) ? data.checklist : [];
+        const ideasList = Array.isArray(data.ideas) ? data.ideas : [];
+
+        const activeProjectsCount = projectsList.filter(p => p.status === 'in_progress' || p.status === 'planned' || p.status === 'In Progress' || p.status === 'Planning').length;
+        const totalChecklist = checklistList.length;
+        const doneChecklist = checklistList.filter(normalizePacked).length;
+        const gearPct = totalChecklist === 0 ? 0 : Math.round((doneChecklist / totalChecklist) * 100);
+
+        return [
+            { label: 'Active Shoots', value: activeProjectsCount, icon: FolderKanban, color: 'text-brand-gold', accent: 'var(--brand-gold)', note: 'Shoots in pipeline' },
+            { label: 'Gear Readiness', value: gearPct, isPct: true, icon: CheckSquare, color: 'text-emerald-400', accent: '#10b981', note: `${doneChecklist}/${totalChecklist} items ready` },
+            { label: 'Creative Ideas', value: ideasList.length, icon: Lightbulb, color: 'text-amber-400', accent: '#f59e0b', note: 'Cataloged concepts' },
+            { label: 'Total Sessions', value: projectsList.length, icon: Camera, color: 'text-sky-400', accent: '#38bdf8', note: 'All-time projects' },
+        ];
+    }, [data.projects, data.checklist, data.ideas]);
+
     if (loading) return (
         <div className="h-full p-5 md:p-8 overflow-y-auto custom-scrollbar">
             <div className="max-w-5xl mx-auto space-y-6">
                 <div className="h-9 w-56 bg-surface-raised rounded-xl animate-[skeleton-pulse_1.5s_ease-in-out_infinite]" />
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {Array.from({ length: 4 }).map((_, i) => (
                         <div key={i} className="h-28 bg-surface-raised rounded-2xl animate-[skeleton-pulse_1.5s_ease-in-out_infinite]" style={{ animationDelay: `${i * 80}ms` }} />
                     ))}
                 </div>
@@ -410,7 +517,7 @@ export default function Dashboard() {
         </div>
     );
 
-    const kpis = [
+    const financialKpis = [
         { label: 'Revenue',    value: totalIncome,    icon: TrendingUp,   color: 'text-emerald-400', accent: '#10b981', note: 'Total income' },
         { label: 'Expenses',   value: totalExpenses,  icon: TrendingDown, color: 'text-red-400',     accent: '#ef4444', note: 'Total costs' },
         { label: 'Capital',    value: totalCapital,   icon: Users,        color: 'text-brand-gold',  accent: 'var(--brand-gold)', note: 'Partner fund' },
@@ -432,111 +539,150 @@ export default function Dashboard() {
                         {greeting}{firstName ? `, ${firstName}` : ''}
                     </p>
                     <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-                        Business <span className="text-brand-gold italic">Overview</span>
+                        {isAdmin ? 'Business' : 'Studio'} <span className="text-brand-gold italic">Overview</span>
                     </h1>
                 </motion.div>
 
-                {/* KPI Grid */}
-                <motion.div variants={stagger} className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    {kpis.map((kpi) => {
-                        const Icon = kpi.icon;
-                        const absVal = Math.abs(kpi.value);
-                        return (
-                            <motion.div key={kpi.label} variants={fadeUp}
-                                className={`relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-gold/20 ${kpi.hero ? 'col-span-2 lg:col-span-1 glow-gold' : ''}`}
-                            >
-                                <div className="absolute top-0 right-0 w-12 h-12 rounded-bl-full" style={{ background: `${kpi.accent}09` }} />
-                                <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-white/[0.06]" style={{ background: `${kpi.accent}12` }}>
-                                    <Icon size={15} className={kpi.color} />
-                                </div>
-                                <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
-                                <div className={`text-2xl font-black tracking-tighter ${kpi.hero ? kpi.color : 'text-foreground'}`}>
-                                    <NumberTicker value={absVal} prefix={kpi.value < 0 ? '-$' : '$'} decimals={2} duration={1.2} />
-                                </div>
-                                <p className={`text-[9px] font-bold mt-1.5 italic opacity-50 ${kpi.color}`}>{kpi.note}</p>
-                            </motion.div>
-                        );
-                    })}
-                </motion.div>
+                {/* Admin Financial KPI Grid */}
+                {isAdmin && (
+                    <motion.div variants={stagger} className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                        {financialKpis.map((kpi) => {
+                            const Icon = kpi.icon;
+                            const absVal = Math.abs(kpi.value);
+                            return (
+                                <motion.div key={kpi.label} variants={fadeUp}
+                                    className={`relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-gold/20 ${kpi.hero ? 'col-span-2 lg:col-span-1 glow-gold' : ''}`}
+                                >
+                                    <div className="absolute top-0 right-0 w-12 h-12 rounded-bl-full" style={{ background: `${kpi.accent}09` }} />
+                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-white/[0.06]" style={{ background: `${kpi.accent}12` }}>
+                                        <Icon size={15} className={kpi.color} />
+                                    </div>
+                                    <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
+                                    <div className={`text-2xl font-black tracking-tighter ${kpi.hero ? kpi.color : 'text-foreground'}`}>
+                                        <NumberTicker value={absVal} prefix={kpi.value < 0 ? '-$' : '$'} decimals={2} duration={1.2} />
+                                    </div>
+                                    <p className={`text-[9px] font-bold mt-1.5 italic opacity-50 ${kpi.color}`}>{kpi.note}</p>
+                                </motion.div>
+                            );
+                        })}
+                    </motion.div>
+                )}
 
-                {/* Growth Chart */}
-                <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                    <div className="px-6 pt-5 pb-4 border-b border-card-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                            <h2 className="text-sm font-black text-foreground tracking-tight">Revenue vs Expenses</h2>
-                            <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Last 6 months · monthly breakdown</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded-sm" style={{ background: '#10b981', opacity: 0.8 }} />
-                                <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Income</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded-sm" style={{ background: '#ef4444', opacity: 0.75 }} />
-                                <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Expense</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6">
-                        <GrowthChart transactions={data.transactions} />
-                    </div>
-                </motion.div>
+                {/* Non-Admin Operational KPI Grid */}
+                {!isAdmin && (
+                    <motion.div variants={stagger} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        {operationalKpis.map((kpi) => {
+                            const Icon = kpi.icon;
+                            return (
+                                <motion.div key={kpi.label} variants={fadeUp}
+                                    className="relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-gold/20"
+                                >
+                                    <div className="absolute top-0 right-0 w-12 h-12 rounded-bl-full" style={{ background: `${kpi.accent}09` }} />
+                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-white/[0.06]" style={{ background: `${kpi.accent}12` }}>
+                                        <Icon size={16} className={kpi.color} />
+                                    </div>
+                                    <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
+                                    <div className="text-2xl font-black tracking-tighter text-foreground">
+                                        <NumberTicker value={kpi.value} suffix={kpi.isPct ? '%' : ''} duration={1.2} />
+                                    </div>
+                                    <p className={`text-[9px] font-bold mt-1.5 italic opacity-50 ${kpi.color}`}>{kpi.note}</p>
+                                </motion.div>
+                            );
+                        })}
+                    </motion.div>
+                )}
 
-                {/* Row: Recent Transactions + Partner Distribution */}
-                <motion.div variants={stagger} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Upcoming Shoot Hero Card */}
+                <UpcomingShootBanner projects={data.projects} />
+
+                {/* Quick Launchpad Shortcuts */}
+                <QuickLaunchpad />
+
+                {/* Growth Chart (Admin Only) */}
+                {isAdmin && (
                     <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                        <div className="px-6 pt-5 pb-4 border-b border-card-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Recent Transactions</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Latest 5 movements</p>
+                                <h2 className="text-sm font-black text-foreground tracking-tight">Revenue vs Expenses</h2>
+                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Last 6 months · monthly breakdown</p>
                             </div>
-                            <Clock size={14} className="text-foreground/20" />
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="w-3 h-3 rounded-sm" style={{ background: '#10b981', opacity: 0.8 }} />
+                                    <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Income</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="w-3 h-3 rounded-sm" style={{ background: '#ef4444', opacity: 0.75 }} />
+                                    <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Expense</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="p-3">
-                            <RecentTransactions transactions={data.transactions} />
+                        <div className="p-4 sm:p-6">
+                            <GrowthChart transactions={data.transactions} />
                         </div>
                     </motion.div>
+                )}
 
-                    <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
-                            <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Partner Distribution</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Capital-based profit share</p>
+                {/* Recent Transactions + Partner Distribution (Admin Only) */}
+                {isAdmin && (
+                    <motion.div variants={stagger} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-sm font-black text-foreground tracking-tight">Recent Transactions</h2>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Latest 5 movements</p>
+                                </div>
+                                <Clock size={14} className="text-foreground/20" />
                             </div>
-                            <DollarSign size={14} className="text-foreground/20" />
-                        </div>
-                        <div className="p-4 space-y-2">
-                            {data.members.length === 0 ? (
-                                <p className="text-center py-8 text-foreground/20 text-sm italic">No partners</p>
-                            ) : (
-                                data.members.map(member => {
-                                    const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
-                                    const profitAmount = distribution.profit;
-                                    const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
-                                    const isPos = profitAmount >= 0;
-                                    return (
-                                        <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center font-black text-brand-gold text-sm group-hover:bg-brand-gold group-hover:text-black transition-all flex-shrink-0">
-                                                    {member.name.charAt(0).toUpperCase()}
+                            <div className="p-3">
+                                <RecentTransactions transactions={data.transactions} />
+                            </div>
+                        </motion.div>
+
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-sm font-black text-foreground tracking-tight">Partner Distribution</h2>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Capital-based profit share</p>
+                                </div>
+                                <DollarSign size={14} className="text-foreground/20" />
+                            </div>
+                            <div className="p-4 space-y-2">
+                                {membersList.length === 0 ? (
+                                    <p className="text-center py-8 text-foreground/20 text-sm italic">No partners</p>
+                                ) : (
+                                    membersList.map(member => {
+                                        const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
+                                        const profitAmount = distribution.profit;
+                                        const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
+                                        const isPos = profitAmount >= 0;
+                                        return (
+                                            <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center font-black text-brand-gold text-sm group-hover:bg-brand-gold group-hover:text-black transition-all flex-shrink-0">
+                                                        {member.name ? member.name.charAt(0).toUpperCase() : '?'}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-foreground leading-none mb-0.5">{member.name}</p>
+                                                        <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{capitalPercentage}% capital</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-xs font-bold text-foreground leading-none mb-0.5">{member.name}</p>
-                                                    <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{capitalPercentage}% capital</p>
-                                                </div>
+                                                <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                    {isPos ? '' : '-'}$<NumberTicker value={Math.abs(profitAmount)} decimals={2} duration={1} />
+                                                </p>
                                             </div>
-                                            <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {isPos ? '' : '-'}$<NumberTicker value={Math.abs(profitAmount)} decimals={2} duration={1} />
-                                            </p>
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </motion.div>
                     </motion.div>
-                </motion.div>
+                )}
 
-                {/* Row: Projects + Ideas + Checklist */}
+                {/* Studio Pro Tip / Motivation */}
+                <StudioMotivationCard />
+
+                {/* Operational Row: Projects + Ideas + Checklist */}
                 <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                     <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
@@ -544,7 +690,7 @@ export default function Dashboard() {
                             <FolderKanban size={14} className="text-brand-gold/60" />
                             <div>
                                 <h2 className="text-sm font-black text-foreground tracking-tight">Recent Projects</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{data.projects.length} total</p>
+                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.projects) ? data.projects.length : 0} total</p>
                             </div>
                         </div>
                         <div className="p-4">
@@ -557,7 +703,7 @@ export default function Dashboard() {
                             <Lightbulb size={14} className="text-brand-gold/60" />
                             <div>
                                 <h2 className="text-sm font-black text-foreground tracking-tight">Ideas</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{data.ideas.length} concepts</p>
+                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.ideas) ? data.ideas.length : 0} concepts</p>
                             </div>
                         </div>
                         <div className="p-5">

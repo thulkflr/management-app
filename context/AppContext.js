@@ -22,9 +22,10 @@ export function AppProvider({ children }) {
         if (status !== 'authenticated') return;
         setLoading(true);
         try {
+            const isAdmin = session?.user?.role === 'Admin';
             const [membersRes, txRes, projectsRes, ideasRes, checklistRes] = await Promise.all([
-                fetch('/api/data?type=Members'),
-                fetch('/api/data?type=Transactions'),
+                isAdmin ? fetch('/api/data?type=Members') : Promise.resolve({ ok: true, json: async () => [] }),
+                isAdmin ? fetch('/api/data?type=Transactions') : Promise.resolve({ ok: true, json: async () => [] }),
                 fetch('/api/data?type=Projects'),
                 fetch('/api/data?type=Ideas'),
                 fetch('/api/data?type=Checklist'),
@@ -32,20 +33,28 @@ export function AppProvider({ children }) {
 
             const [members, transactionsRaw, projects, ideas, checklist] = await Promise.all([
                 membersRes.ok ? membersRes.json() : Promise.resolve([]),
-                txRes.json(),
-                projectsRes.json(),
-                ideasRes.json(),
-                checklistRes.json(),
+                txRes.ok ? txRes.json() : Promise.resolve([]),
+                projectsRes.ok ? projectsRes.json() : Promise.resolve([]),
+                ideasRes.ok ? ideasRes.json() : Promise.resolve([]),
+                checklistRes.ok ? checklistRes.json() : Promise.resolve([]),
             ]);
 
             // Normalize: Handle cases where the spreadsheet header might be 'numberId' instead of 'memberId'
-            const transactions = transactionsRaw.map(tx => ({
+            const rawTxList = Array.isArray(transactionsRaw) ? transactionsRaw : [];
+            const transactions = rawTxList.map(tx => ({
                 ...tx,
                 memberId: tx.memberId || tx.numberId // Map both to memberId for app consistency
             }));
-            const membersWithInvestments = withTotalInvestedAmounts(members, transactions);
+            const membersList = Array.isArray(members) ? members : [];
+            const membersWithInvestments = withTotalInvestedAmounts(membersList, transactions);
 
-            setData({ members: membersWithInvestments, transactions, projects, ideas, checklist });
+            setData({
+                members: membersWithInvestments,
+                transactions,
+                projects: Array.isArray(projects) ? projects : [],
+                ideas: Array.isArray(ideas) ? ideas : [],
+                checklist: Array.isArray(checklist) ? checklist : []
+            });
         } catch (err) {
             console.error("Failed to load data", err);
             setError(err.message);
