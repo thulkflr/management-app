@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -7,11 +7,13 @@ import {
     TrendingUp, TrendingDown, DollarSign, Wallet, BarChart3,
     ArrowUpRight, ArrowDownRight, Lightbulb, FolderKanban,
     Users, Clock, CheckSquare, Camera, Calendar, Sparkles,
-    ArrowRight, Zap
+    ArrowRight, Zap, Gamepad2
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import NumberTicker from '@/components/ui/number-ticker';
 import { calculateProfits } from '@/services/profitCalculator';
+import ShutterSpeedGame from '@/components/ShutterSpeedGame';
+import SnakeGame from '@/components/SnakeGame';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } } };
@@ -329,7 +331,7 @@ function ChecklistProgress({ checklist = [] }) {
     );
 }
 
-// ── Dynamic Operational Components for Non-Admin Dashboard ───────────────────
+// ── Dynamic Operational Components ───────────────────────────────────────────
 function UpcomingShootBanner({ projects = [] }) {
     const raw = Array.isArray(projects) ? projects : [];
     const upcoming = useMemo(() => {
@@ -437,25 +439,42 @@ function QuickLaunchpad() {
     );
 }
 
-function StudioMotivationCard() {
-    const tips = [
-        "Use rim lighting and hair lights to separate black-attire subjects from dark backdrops.",
-        "Always format SD cards in-camera before starting any major graduation or wedding shoot.",
-        "Golden hour lighting is softest 30 minutes before sunset — plan your outdoor portraits accordingly.",
-        "Check battery levels & clear memory cards at least 2 hours before departing for a venue.",
-    ];
-    const randomTip = useMemo(() => tips[Math.floor(Math.random() * tips.length)], []);
+// ── Interactive Arcade Bar ──────────────────────────────────────────────────
+function ArcadeZone() {
+    const [activeTab, setActiveTab] = useState('snake'); // 'snake' | 'shutter'
 
     return (
-        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border p-5 md:p-6 flex items-start gap-4 shadow-lg">
-            <div className="w-10 h-10 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
-                <Sparkles size={20} />
+        <motion.div variants={fadeUp} className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                    <Gamepad2 size={15} className="text-emerald-400" /> Member Arcade & Break Room
+                </h2>
+                <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-card-bg border border-card-border">
+                    <button
+                        onClick={() => setActiveTab('snake')}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                            activeTab === 'snake'
+                                ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
+                                : 'text-foreground/40 hover:text-foreground'
+                        }`}
+                    >
+                        🐍 Atari Snake
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('shutter')}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                            activeTab === 'shutter'
+                                ? 'bg-brand-gold text-black shadow-md shadow-brand-gold/20'
+                                : 'text-foreground/40 hover:text-foreground'
+                        }`}
+                    >
+                        📸 Shutter Speed
+                    </button>
+                </div>
             </div>
-            <div className="space-y-1">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-brand-gold">Studio Pro Tip & Focus</h4>
-                <p className="text-xs font-bold text-foreground/75 leading-relaxed italic">
-                    &quot;{randomTip}&quot;
-                </p>
+
+            <div className="max-w-2xl mx-auto">
+                {activeTab === 'snake' ? <SnakeGame /> : <ShutterSpeedGame />}
             </div>
         </motion.div>
     );
@@ -531,16 +550,23 @@ export default function Dashboard() {
 
     return (
         <div className="h-full overflow-y-auto p-5 md:p-8 custom-scrollbar">
-            <motion.div className="max-w-5xl mx-auto space-y-6" variants={stagger} initial="hidden" animate="show">
+            <motion.div className="max-w-5xl mx-auto space-y-7" variants={stagger} initial="hidden" animate="show">
 
                 {/* Header */}
-                <motion.div variants={fadeUp} className="space-y-0.5">
-                    <p className="text-[10px] font-black text-foreground/25 uppercase tracking-[0.3em]">
-                        {greeting}{firstName ? `, ${firstName}` : ''}
-                    </p>
-                    <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-                        {isAdmin ? 'Business' : 'Studio'} <span className="text-brand-gold italic">Overview</span>
-                    </h1>
+                <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-card-border pb-4">
+                    <div>
+                        <p className="text-[10px] font-black text-foreground/25 uppercase tracking-[0.3em]">
+                            {greeting}{firstName ? `, ${firstName}` : ''}
+                        </p>
+                        <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
+                            {isAdmin ? 'Business' : 'Studio'} <span className="text-brand-gold italic">Overview</span>
+                        </h1>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${isAdmin ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}`}>
+                            {isAdmin ? '🛡️ Admin Workspace' : '📸 Member Studio'}
+                        </span>
+                    </div>
                 </motion.div>
 
                 {/* Admin Financial KPI Grid */}
@@ -592,138 +618,147 @@ export default function Dashboard() {
                     </motion.div>
                 )}
 
-                {/* Upcoming Shoot Hero Card */}
-                <UpcomingShootBanner projects={data.projects} />
+                {/* SECTION 1: Next Scheduled Session & Quick Launchpad */}
+                <div className="space-y-4 pt-1">
+                    <UpcomingShootBanner projects={data.projects} />
+                    <QuickLaunchpad />
+                </div>
 
-                {/* Quick Launchpad Shortcuts */}
-                <QuickLaunchpad />
+                {/* SECTION 2: Member Arcade & Break Room (Atari Snake + Shutter Speed) */}
+                <ArcadeZone />
 
-                {/* Growth Chart (Admin Only) */}
+                {/* SECTION 3: Financial Analytics (Admin Only) */}
                 {isAdmin && (
-                    <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-6 pt-5 pb-4 border-b border-card-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Revenue vs Expenses</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Last 6 months · monthly breakdown</p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="w-3 h-3 rounded-sm" style={{ background: '#10b981', opacity: 0.8 }} />
-                                    <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Income</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="w-3 h-3 rounded-sm" style={{ background: '#ef4444', opacity: 0.75 }} />
-                                    <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Expense</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-4 sm:p-6">
-                            <GrowthChart transactions={data.transactions} />
-                        </div>
-                    </motion.div>
-                )}
+                    <div className="space-y-5 pt-2">
+                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                            <BarChart3 size={15} className="text-brand-gold" /> Financial Intelligence & Analytics
+                        </h2>
 
-                {/* Recent Transactions + Partner Distribution (Admin Only) */}
-                {isAdmin && (
-                    <motion.div variants={stagger} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden shadow-xl">
+                            <div className="px-6 pt-5 pb-4 border-b border-card-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                 <div>
-                                    <h2 className="text-sm font-black text-foreground tracking-tight">Recent Transactions</h2>
-                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Latest 5 movements</p>
+                                    <h3 className="text-sm font-black text-foreground tracking-tight">Revenue vs Expenses</h3>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Last 6 months · monthly breakdown</p>
                                 </div>
-                                <Clock size={14} className="text-foreground/20" />
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-3 h-3 rounded-sm" style={{ background: '#10b981', opacity: 0.8 }} />
+                                        <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Income</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-3 h-3 rounded-sm" style={{ background: '#ef4444', opacity: 0.75 }} />
+                                        <span className="text-[9px] font-black text-foreground/40 uppercase tracking-widest">Expense</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="p-3">
-                                <RecentTransactions transactions={data.transactions} />
+                            <div className="p-4 sm:p-6">
+                                <GrowthChart transactions={data.transactions} />
                             </div>
                         </motion.div>
 
-                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-sm font-black text-foreground tracking-tight">Partner Distribution</h2>
-                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Capital-based profit share</p>
+                        <motion.div variants={stagger} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                                <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-black text-foreground tracking-tight">Recent Transactions</h3>
+                                        <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Latest 5 movements</p>
+                                    </div>
+                                    <Clock size={14} className="text-foreground/20" />
                                 </div>
-                                <DollarSign size={14} className="text-foreground/20" />
-                            </div>
-                            <div className="p-4 space-y-2">
-                                {membersList.length === 0 ? (
-                                    <p className="text-center py-8 text-foreground/20 text-sm italic">No partners</p>
-                                ) : (
-                                    membersList.map(member => {
-                                        const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
-                                        const profitAmount = distribution.profit;
-                                        const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
-                                        const isPos = profitAmount >= 0;
-                                        return (
-                                            <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center font-black text-brand-gold text-sm group-hover:bg-brand-gold group-hover:text-black transition-all flex-shrink-0">
-                                                        {member.name ? member.name.charAt(0).toUpperCase() : '?'}
+                                <div className="p-3">
+                                    <RecentTransactions transactions={data.transactions} />
+                                </div>
+                            </motion.div>
+
+                            <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                                <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-black text-foreground tracking-tight">Partner Distribution</h3>
+                                        <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Capital-based profit share</p>
+                                    </div>
+                                    <DollarSign size={14} className="text-foreground/20" />
+                                </div>
+                                <div className="p-4 space-y-2">
+                                    {membersList.length === 0 ? (
+                                        <p className="text-center py-8 text-foreground/20 text-sm italic">No partners</p>
+                                    ) : (
+                                        membersList.map(member => {
+                                            const distribution = profitByPartner[member.id] || { percentage: 0, profit: 0 };
+                                            const profitAmount = distribution.profit;
+                                            const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
+                                            const isPos = profitAmount >= 0;
+                                            return (
+                                                <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center font-black text-brand-gold text-sm group-hover:bg-brand-gold group-hover:text-black transition-all flex-shrink-0">
+                                                            {member.name ? member.name.charAt(0).toUpperCase() : '?'}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs font-bold text-foreground leading-none mb-0.5">{member.name}</p>
+                                                            <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{capitalPercentage}% capital</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-foreground leading-none mb-0.5">{member.name}</p>
-                                                        <p className="text-[8px] font-black text-foreground/25 uppercase tracking-widest">{capitalPercentage}% capital</p>
-                                                    </div>
+                                                    <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                        {isPos ? '' : '-'}$<NumberTicker value={Math.abs(profitAmount)} decimals={2} duration={1} />
+                                                    </p>
                                                 </div>
-                                                <p className={`text-sm font-black tabular ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                    {isPos ? '' : '-'}$<NumberTicker value={Math.abs(profitAmount)} decimals={2} duration={1} />
-                                                </p>
-                                            </div>
-                                        );
-                                    })
-                                )}
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                )}
+
+                {/* SECTION 4: Studio Operations Grid */}
+                <div className="space-y-3 pt-2">
+                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                        <FolderKanban size={15} className="text-sky-400" /> Active Operations & Production
+                    </h2>
+
+                    <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
+                                <FolderKanban size={14} className="text-brand-gold/60" />
+                                <div>
+                                    <h3 className="text-sm font-black text-foreground tracking-tight">Recent Projects</h3>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.projects) ? data.projects.length : 0} total</p>
+                                </div>
+                            </div>
+                            <div className="p-4">
+                                <RecentProjects projects={data.projects} />
+                            </div>
+                        </motion.div>
+
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
+                                <Lightbulb size={14} className="text-brand-gold/60" />
+                                <div>
+                                    <h3 className="text-sm font-black text-foreground tracking-tight">Ideas</h3>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.ideas) ? data.ideas.length : 0} concepts</p>
+                                </div>
+                            </div>
+                            <div className="p-5">
+                                <StatusBreakdown items={data.ideas} colorMap={IDEA_COLORS} emptyText="No ideas yet" />
+                            </div>
+                        </motion.div>
+
+                        <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
+                            <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
+                                <CheckSquare size={14} className="text-brand-gold/60" />
+                                <div>
+                                    <h3 className="text-sm font-black text-foreground tracking-tight">Gear Checklist</h3>
+                                    <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Equipment readiness</p>
+                                </div>
+                            </div>
+                            <div className="p-5">
+                                <ChecklistProgress checklist={data.checklist} />
                             </div>
                         </motion.div>
                     </motion.div>
-                )}
-
-                {/* Studio Pro Tip / Motivation */}
-                <StudioMotivationCard />
-
-                {/* Operational Row: Projects + Ideas + Checklist */}
-                <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                    <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                            <FolderKanban size={14} className="text-brand-gold/60" />
-                            <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Recent Projects</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.projects) ? data.projects.length : 0} total</p>
-                            </div>
-                        </div>
-                        <div className="p-4">
-                            <RecentProjects projects={data.projects} />
-                        </div>
-                    </motion.div>
-
-                    <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                            <Lightbulb size={14} className="text-brand-gold/60" />
-                            <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Ideas</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.ideas) ? data.ideas.length : 0} concepts</p>
-                            </div>
-                        </div>
-                        <div className="p-5">
-                            <StatusBreakdown items={data.ideas} colorMap={IDEA_COLORS} emptyText="No ideas yet" />
-                        </div>
-                    </motion.div>
-
-                    <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
-                        <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                            <CheckSquare size={14} className="text-brand-gold/60" />
-                            <div>
-                                <h2 className="text-sm font-black text-foreground tracking-tight">Gear Checklist</h2>
-                                <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Equipment readiness</p>
-                            </div>
-                        </div>
-                        <div className="p-5">
-                            <ChecklistProgress checklist={data.checklist} />
-                        </div>
-                    </motion.div>
-                </motion.div>
+                </div>
 
             </motion.div>
         </div>
