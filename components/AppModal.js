@@ -86,22 +86,22 @@ export default function AppModal({ isOpen, onClose, title, children, description
                         role="dialog"
                         aria-modal="true"
                         aria-label={title}
-                        className="relative w-full max-w-2xl max-h-[92dvh] sm:max-h-[86vh] overflow-hidden rounded-t-[2rem] sm:rounded-[28px] border border-white/10 bg-card-bg/95 shadow-[0_32px_110px_rgba(0,0,0,0.62)] backdrop-blur-2xl flex flex-col"
+                        className="relative w-full max-w-2xl max-h-[92dvh] sm:max-h-[86vh] overflow-hidden rounded-t-[2rem] sm:rounded-[28px] border border-foreground/10 bg-card-bg/95 shadow-[0_32px_110px_rgba(0,0,0,0.62)] backdrop-blur-2xl flex flex-col"
                         variants={sheetVariants}
                         initial="hidden"
                         animate="show"
                         exit="exit"
                     >
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/8 to-transparent" />
-                        <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/45 to-transparent" />
+                        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-foreground/8 to-transparent" />
+                        <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/45 to-transparent" />
 
                         <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0 relative z-10">
                             <div className="w-10 h-1 rounded-full bg-foreground/15" />
                         </div>
 
-                        <div className="relative z-10 flex items-start justify-between gap-4 px-6 sm:px-7 py-5 sm:py-6 border-b border-white/10 flex-shrink-0">
+                        <div className="relative z-10 flex items-start justify-between gap-4 px-6 sm:px-7 py-5 sm:py-6 border-b border-foreground/10 flex-shrink-0">
                             <div className="flex items-start gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-2xl bg-brand-gold/12 border border-brand-gold/25 text-brand-gold flex items-center justify-center shadow-lg shadow-brand-gold/5 flex-shrink-0">
+                                <div className="w-10 h-10 rounded-2xl bg-brand-accent/12 border border-brand-accent/25 text-brand-accent flex items-center justify-center shadow-lg shadow-brand-accent/5 flex-shrink-0">
                                     {icon || <DefaultTitleIcon title={title} />}
                                 </div>
                                 <div className="min-w-0 pt-0.5">
@@ -120,7 +120,7 @@ export default function AppModal({ isOpen, onClose, title, children, description
                                 onClick={onClose}
                                 whileHover={{ scale: 1.04 }}
                                 whileTap={{ scale: 0.94 }}
-                                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-white/5 border border-white/8 text-foreground/45 hover:text-foreground hover:bg-white/10 hover:border-white/15 transition-colors flex-shrink-0"
+                                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-foreground/5 border border-foreground/8 text-foreground/45 hover:text-foreground hover:bg-foreground/10 hover:border-foreground/15 transition-colors flex-shrink-0"
                                 aria-label="Close modal"
                             >
                                 <X size={17} />

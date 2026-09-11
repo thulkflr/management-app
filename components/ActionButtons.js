@@ -21,13 +21,13 @@ export default function ActionButtons({ onView, onEdit, onDelete }) {
     if (!hasButtons) return null;
 
     return (
-        <div className="flex items-center gap-0.5 rounded-xl bg-white/[0.03] border border-white/[0.05] px-1 py-1">
+        <div className="flex items-center gap-0.5 rounded-xl bg-foreground/[0.03] border border-foreground/[0.05] px-1 py-1">
             {onView && (
                 <Btn
                     onClick={onView}
                     icon={Eye}
                     title="View"
-                    colorClass="hover:text-brand-gold hover:bg-brand-gold/10"
+                    colorClass="hover:text-brand-accent hover:bg-brand-accent/10"
                 />
             )}
             {onEdit && (

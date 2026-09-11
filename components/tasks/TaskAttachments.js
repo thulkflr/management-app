@@ -55,9 +55,9 @@ export default function TaskAttachments({ attachments = [], onChange }) {
                 {attachments.map((file) => (
                     <div 
                         key={file.id} 
-                        className="group relative flex items-center gap-3 p-3 rounded-xl border border-card-border bg-accent-slate/30 hover:border-brand-gold/30 transition-all"
+                        className="group relative flex items-center gap-3 p-3 rounded-xl border border-card-border bg-accent-slate/30 hover:border-brand-accent/30 transition-all"
                     >
-                        <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center text-brand-gold border border-card-border overflow-hidden">
+                        <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center text-brand-accent border border-card-border overflow-hidden">
                             {file.type?.startsWith('image/') ? (
                                 <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
                             ) : (
@@ -70,7 +70,7 @@ export default function TaskAttachments({ attachments = [], onChange }) {
                                 href={file.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-[10px] font-black text-brand-gold uppercase tracking-widest hover:underline flex items-center gap-1"
+                                className="text-[10px] font-black text-brand-accent uppercase tracking-widest hover:underline flex items-center gap-1"
                             >
                                 View File <ExternalLink size={8} />
                             </a>
@@ -87,7 +87,7 @@ export default function TaskAttachments({ attachments = [], onChange }) {
                 <button 
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="flex items-center justify-center gap-3 p-5 rounded-xl border border-dashed border-card-border bg-accent-slate/20 hover:border-brand-gold/40 hover:bg-brand-gold/5 transition-all text-text-muted hover:text-brand-gold group"
+                    className="flex items-center justify-center gap-3 p-5 rounded-xl border border-dashed border-card-border bg-accent-slate/20 hover:border-brand-accent/40 hover:bg-brand-accent/5 transition-all text-text-muted hover:text-brand-accent group"
                 >
                     {isUploading ? (
                         <Loader2 size={20} className="animate-spin" />

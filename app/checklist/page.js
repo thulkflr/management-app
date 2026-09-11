@@ -220,9 +220,9 @@ export default function ChecklistPage() {
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
-            <div className="h-8 w-52 bg-brand-gold/10 rounded-xl" />
-            <div className="h-16 bg-brand-gold/10 rounded-2xl" />
-            {[1, 2, 3].map(i => <div key={i} className="h-36 bg-brand-gold/10 rounded-3xl" />)}
+            <div className="h-8 w-52 bg-brand-accent/10 rounded-xl" />
+            <div className="h-16 bg-brand-accent/10 rounded-2xl" />
+            {[1, 2, 3].map(i => <div key={i} className="h-36 bg-brand-accent/10 rounded-3xl" />)}
         </div>
     );
 
@@ -234,10 +234,10 @@ export default function ChecklistPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                            <span className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent flex-shrink-0">
                                 <ListChecks size={18} />
                             </span>
-                            Shot <span className="text-brand-gold italic">Checklist</span>
+                            Shot <span className="text-brand-accent italic">Checklist</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {globalPacked}/{globalTotal} packed · {globalPct}%
@@ -245,7 +245,7 @@ export default function ChecklistPage() {
                     </div>
                     <div className="flex gap-2 flex-wrap">
                         <button onClick={() => markAll(false)} disabled={isSaving || globalTotal === 0}
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-card-border font-black text-xs text-foreground/50 hover:border-brand-gold/30 hover:text-foreground/80 transition disabled:opacity-40">
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-card-border font-black text-xs text-foreground/50 hover:border-brand-accent/30 hover:text-foreground/80 transition disabled:opacity-40">
                             <RefreshCcw size={13} /> Reset
                         </button>
                         <button onClick={() => markAll(true)} disabled={isSaving || globalTotal === 0}
@@ -253,7 +253,7 @@ export default function ChecklistPage() {
                             <CheckCircle2 size={13} /> Mark All
                         </button>
                         <button onClick={() => setShowNewSectionInput(s => !s)}
-                            className="flex items-center gap-1.5 bg-brand-gold text-black px-5 py-2.5 rounded-xl font-black text-xs shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all">
+                            className="flex items-center gap-1.5 bg-brand-accent text-background px-5 py-2.5 rounded-xl font-black text-xs shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all">
                             {showNewSectionInput ? <X size={13} /> : <FolderPlus size={13} />}
                             {showNewSectionInput ? 'Cancel' : 'Add Section'}
                         </button>
@@ -265,10 +265,10 @@ export default function ChecklistPage() {
                     <div className="bg-card-bg rounded-2xl border border-card-border p-4">
                         <div className="flex justify-between items-center mb-2">
                             <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Overall Progress</p>
-                            <p className="text-xs font-black text-brand-gold">{globalPct}%</p>
+                            <p className="text-xs font-black text-brand-accent">{globalPct}%</p>
                         </div>
                         <div className="h-2 rounded-full bg-background border border-card-border overflow-hidden">
-                            <div className="h-full bg-brand-gold transition-all duration-500"
+                            <div className="h-full bg-brand-accent transition-all duration-500"
                                 style={{ width: `${globalPct}%`, background: globalPct === 100 ? '#10b981' : undefined }} />
                         </div>
                     </div>
@@ -279,8 +279,8 @@ export default function ChecklistPage() {
                     <form onSubmit={addSection} className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
                         <input autoFocus type="text" placeholder="Section name, e.g. Camera Gear"
                             value={newSectionInput} onChange={e => setNewSectionInput(e.target.value)}
-                            className="flex-1 rounded-2xl border border-brand-gold/30 px-4 py-3 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
-                        <button type="submit" className="bg-brand-gold text-black px-5 py-3 rounded-2xl font-black text-sm hover:opacity-90 active:scale-95 transition">
+                            className="flex-1 rounded-2xl border border-brand-accent/30 px-4 py-3 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
+                        <button type="submit" className="bg-brand-accent text-background px-5 py-3 rounded-2xl font-black text-sm hover:opacity-90 active:scale-95 transition">
                             Create
                         </button>
                     </form>
@@ -293,7 +293,7 @@ export default function ChecklistPage() {
                         <p className="font-black uppercase tracking-widest text-sm">No sections yet</p>
                         <p className="text-xs mt-1 font-medium">Create a section to start adding checklist items.</p>
                         <button onClick={() => setShowNewSectionInput(true)}
-                            className="mt-5 inline-flex items-center gap-2 bg-brand-gold text-black px-6 py-2.5 rounded-2xl font-black text-xs shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all">
+                            className="mt-5 inline-flex items-center gap-2 bg-brand-accent text-background px-6 py-2.5 rounded-2xl font-black text-xs shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all">
                             <FolderPlus size={14} /> Add First Section
                         </button>
                     </div>
@@ -313,7 +313,7 @@ export default function ChecklistPage() {
                             {/* Section header */}
                             <div className="flex items-center gap-3 p-4 border-b border-card-border/50">
                                 <button type="button" onClick={() => toggleCollapse(section)}
-                                    className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-foreground/40 hover:text-brand-gold hover:bg-brand-gold/10 transition">
+                                    className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-foreground/40 hover:text-brand-accent hover:bg-brand-accent/10 transition">
                                     {isCollapsed ? <ChevronRight size={15} /> : <ChevronDown size={15} />}
                                 </button>
 
@@ -321,9 +321,9 @@ export default function ChecklistPage() {
                                     <form onSubmit={confirmRename} className="flex-1 flex gap-2">
                                         <input autoFocus type="text" value={renameValue}
                                             onChange={e => setRenameValue(e.target.value)}
-                                            className="flex-1 rounded-xl border border-brand-gold/30 px-3 py-1.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold"
+                                            className="flex-1 rounded-xl border border-brand-accent/30 px-3 py-1.5 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold"
                                             onKeyDown={e => e.key === 'Escape' && setRenamingSection(null)} />
-                                        <button type="submit" className="w-7 h-7 rounded-lg bg-brand-gold text-black flex items-center justify-center hover:opacity-90 transition">
+                                        <button type="submit" className="w-7 h-7 rounded-lg bg-brand-accent text-background flex items-center justify-center hover:opacity-90 transition">
                                             <Check size={13} />
                                         </button>
                                         <button type="button" onClick={() => setRenamingSection(null)}
@@ -337,7 +337,7 @@ export default function ChecklistPage() {
                                         {total > 0 && (
                                             <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${
                                                 pct === 100 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                    : 'bg-brand-gold/8 text-brand-gold/60 border-brand-gold/15'}`}>
+                                                    : 'bg-brand-accent/8 text-brand-accent/60 border-brand-accent/15'}`}>
                                                 {packed}/{total}
                                             </span>
                                         )}
@@ -352,7 +352,7 @@ export default function ChecklistPage() {
                                 {!isRenaming && (
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                         <button onClick={() => startRename(section)}
-                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-foreground/30 hover:text-brand-gold hover:bg-brand-gold/10 transition">
+                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-foreground/30 hover:text-brand-accent hover:bg-brand-accent/10 transition">
                                             <Pencil size={13} />
                                         </button>
                                         <button onClick={() => deleteSection(section)} disabled={isSaving}
@@ -372,7 +372,7 @@ export default function ChecklistPage() {
                                             <div className="h-full transition-all duration-500"
                                                 style={{
                                                     width: `${pct}%`,
-                                                    background: pct === 100 ? '#10b981' : 'var(--brand-gold)',
+                                                    background: pct === 100 ? '#10b981' : 'var(--brand-accent)',
                                                 }} />
                                         </div>
                                     )}
@@ -391,7 +391,7 @@ export default function ChecklistPage() {
                                                 })
                                                 .map(item => (
                                                     <div key={item.id}
-                                                        className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${item.isPacked ? 'border-emerald-500/15 bg-emerald-500/3' : 'border-card-border hover:border-brand-gold/20'}`}>
+                                                        className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${item.isPacked ? 'border-emerald-500/15 bg-emerald-500/3' : 'border-card-border hover:border-brand-accent/20'}`}>
                                                         <button type="button" onClick={() => togglePacked(item)}
                                                             className="flex-shrink-0 w-8 h-8 rounded-xl border border-card-border bg-background flex items-center justify-center hover:scale-105 active:scale-95 transition">
                                                             {item.isPacked
@@ -406,7 +406,7 @@ export default function ChecklistPage() {
                                                             {(item.quantity > 1 || item.notes) && (
                                                                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                                                     {item.quantity > 1 && (
-                                                                        <span className="text-[9px] font-black uppercase tracking-widest text-foreground/30 bg-white/4 px-1.5 py-0.5 rounded border border-card-border">
+                                                                        <span className="text-[9px] font-black uppercase tracking-widest text-foreground/30 bg-foreground/4 px-1.5 py-0.5 rounded border border-card-border">
                                                                             ×{item.quantity}
                                                                         </span>
                                                                     )}
@@ -428,21 +428,21 @@ export default function ChecklistPage() {
                                     {/* Add item form */}
                                     {addItemSection === section ? (
                                         <form onSubmit={e => handleAddItem(e, section)}
-                                            className="bg-background/60 rounded-2xl border border-brand-gold/20 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            className="bg-background/60 rounded-2xl border border-brand-accent/20 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
                                             <div className="flex gap-2">
                                                 <input autoFocus required type="text" placeholder="Item name..."
                                                     value={addItemForm.name} onChange={e => setAddItemForm(p => ({ ...p, name: e.target.value }))}
-                                                    className="flex-1 rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                                    className="flex-1 rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                                                 <input type="number" min="1" step="1" placeholder="Qty"
                                                     value={addItemForm.quantity} onChange={e => setAddItemForm(p => ({ ...p, quantity: e.target.value }))}
-                                                    className="w-16 rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                                    className="w-16 rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                                             </div>
                                             <input type="text" placeholder="Notes (optional)"
                                                 value={addItemForm.notes} onChange={e => setAddItemForm(p => ({ ...p, notes: e.target.value }))}
-                                                className="block w-full rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                                className="block w-full rounded-xl border border-card-border px-3 py-2 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                                             <div className="flex gap-2">
                                                 <button type="submit" disabled={isSaving}
-                                                    className="flex-1 bg-brand-gold text-black py-2 rounded-xl font-black text-xs shadow-md hover:opacity-90 active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-1">
+                                                    className="flex-1 bg-brand-accent text-background py-2 rounded-xl font-black text-xs shadow-md hover:opacity-90 active:scale-95 transition disabled:opacity-50 flex items-center justify-center gap-1">
                                                     {isSaving ? <Loader size={14} /> : <Plus size={14} />}
                                                     {isSaving ? 'Adding...' : 'Add'}
                                                 </button>
@@ -454,7 +454,7 @@ export default function ChecklistPage() {
                                         </form>
                                     ) : (
                                         <button onClick={() => { setAddItemSection(section); setAddItemForm({ name: '', quantity: 1, notes: '' }); }}
-                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed border-card-border text-foreground/25 font-black text-xs uppercase tracking-wider hover:border-brand-gold/30 hover:text-brand-gold/60 transition">
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed border-card-border text-foreground/25 font-black text-xs uppercase tracking-wider hover:border-brand-accent/30 hover:text-brand-accent/60 transition">
                                             <Plus size={13} /> Add Item
                                         </button>
                                     )}
@@ -467,7 +467,7 @@ export default function ChecklistPage() {
                 {/* "Add another section" shortcut at bottom */}
                 {allSectionNames.length > 0 && !showNewSectionInput && (
                     <button onClick={() => setShowNewSectionInput(true)}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-3xl border border-dashed border-card-border text-foreground/20 font-black text-xs uppercase tracking-wider hover:border-brand-gold/30 hover:text-brand-gold/50 transition">
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-3xl border border-dashed border-card-border text-foreground/20 font-black text-xs uppercase tracking-wider hover:border-brand-accent/30 hover:text-brand-accent/50 transition">
                         <FolderPlus size={14} /> Add Section
                     </button>
                 )}
@@ -491,27 +491,27 @@ export default function ChecklistPage() {
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Item Name</label>
                             <input required type="text" value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Section</label>
                                 <input type="text" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Quantity</label>
                                 <input type="number" min="1" step="1" value={editForm.quantity} onChange={e => setEditForm(p => ({ ...p, quantity: e.target.value }))}
-                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                             </div>
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Notes</label>
                             <input type="text" value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
-                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none text-sm font-bold" />
+                                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none text-sm font-bold" />
                         </div>
                         <button disabled={isSaving} type="submit"
-                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            className="bg-brand-accent text-background p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Item'}
                         </button>
@@ -525,22 +525,22 @@ export default function ChecklistPage() {
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-black text-foreground">{item.name}</h3>
                                     <div className="flex flex-wrap gap-2">
-                                        <span className="px-2.5 py-1 bg-brand-gold/10 text-brand-gold text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-gold/15 italic">{item.category || 'Other'}</span>
-                                        <span className="px-2.5 py-1 bg-white/5 text-foreground/40 text-[10px] font-black uppercase tracking-widest rounded-full border border-card-border">Qty: {item.quantity || 1}</span>
+                                        <span className="px-2.5 py-1 bg-brand-accent/10 text-brand-accent text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-accent/15 italic">{item.category || 'Other'}</span>
+                                        <span className="px-2.5 py-1 bg-foreground/5 text-foreground/40 text-[10px] font-black uppercase tracking-widest rounded-full border border-card-border">Qty: {item.quantity || 1}</span>
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${packed ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-foreground/5 text-foreground/40 border-card-border'}`}>
                                             {packed ? 'Packed' : 'Not Packed'}
                                         </span>
                                     </div>
                                 </div>
                                 <button type="button" onClick={() => togglePacked(item)}
-                                    className="px-4 py-2 rounded-2xl font-black text-xs border border-card-border bg-background hover:border-brand-gold/30 transition text-foreground/50">
+                                    className="px-4 py-2 rounded-2xl font-black text-xs border border-card-border bg-background hover:border-brand-accent/30 transition text-foreground/50">
                                     Toggle
                                 </button>
                             </div>
                             {item.notes && (
                                 <div>
                                     <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mb-2">Notes</p>
-                                    <p className="text-sm font-medium text-foreground/60 bg-white/4 p-4 rounded-2xl border border-card-border">{item.notes}</p>
+                                    <p className="text-sm font-medium text-foreground/60 bg-foreground/4 p-4 rounded-2xl border border-card-border">{item.notes}</p>
                                 </div>
                             )}
                         </div>
