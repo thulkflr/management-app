@@ -23,7 +23,7 @@ const getEmptyForm = () => ({
 const TYPE_CONFIG = {
     income:   { label: 'Income',   color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20', dot: 'bg-emerald-400' },
     expense:  { label: 'Expense',  color: 'text-red-400    bg-red-400/10    border-red-400/20',    dot: 'bg-red-400'    },
-    capital:  { label: 'Capital',  color: 'text-brand-gold bg-brand-gold/10 border-brand-gold/20', dot: 'bg-brand-gold' },
+    capital:  { label: 'Capital',  color: 'text-brand-accent bg-brand-accent/10 border-brand-accent/20', dot: 'bg-brand-accent' },
 };
 
 function TxFormFields({ formData, setFormData, members }) {
@@ -34,7 +34,7 @@ function TxFormFields({ formData, setFormData, members }) {
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Description</label>
                     <input required type="text" placeholder="e.g. Wedding Shoot Payment"
                         value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributor</label>
@@ -51,7 +51,7 @@ function TxFormFields({ formData, setFormData, members }) {
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Amount ($)</label>
                     <input required type="number" min="0" step="0.01" placeholder="0.00"
                         value={formData.amount} onChange={e => setFormData(p => ({ ...p, amount: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Type</label>
@@ -69,7 +69,7 @@ function TxFormFields({ formData, setFormData, members }) {
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date</label>
                     <input required type="date" value={formData.date} onChange={e => setFormData(p => ({ ...p, date: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                 </div>
             </div>
         </>
@@ -174,11 +174,11 @@ export default function Wallet() {
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
-            <div className="h-8 w-52 bg-brand-gold/10 rounded-xl" />
+            <div className="h-8 w-52 bg-brand-accent/10 rounded-xl" />
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[1,2,3,4].map(i => <div key={i} className="h-24 bg-brand-gold/10 rounded-2xl" />)}
+                {[1,2,3,4].map(i => <div key={i} className="h-24 bg-brand-accent/10 rounded-2xl" />)}
             </div>
-            <div className="h-64 bg-brand-gold/10 rounded-3xl" />
+            <div className="h-64 bg-brand-accent/10 rounded-3xl" />
         </div>
     );
 
@@ -190,10 +190,10 @@ export default function Wallet() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                            <span className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent flex-shrink-0">
                                 <WalletIcon size={18} />
                             </span>
-                            Studio <span className="text-brand-gold italic">Finance</span>
+                            Studio <span className="text-brand-accent italic">Finance</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {data.transactions.length} transactions total
@@ -201,7 +201,7 @@ export default function Wallet() {
                     </div>
                     <button
                         onClick={() => { setShowForm(s => !s); setFormData(getEmptyForm()); setModalConfig({ isOpen: false, type: null, data: null }); }}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-accent text-background px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         {showForm ? <X size={16} /> : <Plus size={16} />}
                         {showForm ? 'Cancel' : 'New Transaction'}
@@ -224,12 +224,12 @@ export default function Wallet() {
                         </div>
                         <p className="text-xl font-black text-red-400">${totalExpenses.toLocaleString()}</p>
                     </div>
-                    <div className="bg-card-bg p-4 rounded-2xl border border-card-border border-l-2 border-l-brand-gold">
+                    <div className="bg-card-bg p-4 rounded-2xl border border-card-border border-l-2 border-l-brand-accent">
                         <div className="flex items-center gap-2 mb-2">
-                            <Landmark size={14} className="text-brand-gold" />
+                            <Landmark size={14} className="text-brand-accent" />
                             <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Capital</p>
                         </div>
-                        <p className="text-xl font-black text-brand-gold">${totalCapital.toLocaleString()}</p>
+                        <p className="text-xl font-black text-brand-accent">${totalCapital.toLocaleString()}</p>
                     </div>
                     <div className={`p-4 rounded-2xl ${netProfit >= 0 ? 'bg-emerald-500/15 border border-emerald-500/20' : 'bg-red-500/15 border border-red-500/20'}`}>
                         <p className="text-[9px] font-black text-foreground/40 uppercase tracking-widest mb-2">Net Profit</p>
@@ -260,7 +260,7 @@ export default function Wallet() {
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
                                 placeholder="Search transactions..."
-                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold"
+                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold"
                             />
                             {query && (
                                 <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/70 transition">
@@ -273,13 +273,13 @@ export default function Wallet() {
                         <button onClick={() => setShowFilters(s => !s)}
                             className={`relative flex items-center gap-2 px-4 py-3 rounded-2xl border font-black text-sm transition-all ${
                                 showFilters || hasFilters
-                                    ? 'bg-brand-gold text-black border-brand-gold shadow-lg shadow-brand-gold/20'
-                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-gold/30'
+                                    ? 'bg-brand-accent text-background border-brand-accent shadow-lg shadow-brand-accent/20'
+                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-accent/30'
                             }`}>
                             <SlidersHorizontal size={15} />
                             <span className="hidden sm:inline">Filters</span>
                             {activeCount > 0 && (
-                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-gold text-black'}`}>
+                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-accent text-background'}`}>
                                     {activeCount}
                                 </span>
                             )}
@@ -310,12 +310,12 @@ export default function Wallet() {
                                         <button key={opt.key} onClick={() => setTypeFilter(opt.key)}
                                             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
                                                 typeFilter === opt.key
-                                                    ? 'bg-brand-gold text-black border-brand-gold'
-                                                    : 'border-card-border text-foreground/40 hover:border-brand-gold/30 hover:text-foreground/70'
+                                                    ? 'bg-brand-accent text-background border-brand-accent'
+                                                    : 'border-card-border text-foreground/40 hover:border-brand-accent/30 hover:text-foreground/70'
                                             }`}>
                                             {opt.key !== 'all' && (
                                                 <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${
-                                                    opt.key === 'income' ? 'bg-emerald-400' : opt.key === 'expense' ? 'bg-red-400' : 'bg-brand-gold'
+                                                    opt.key === 'income' ? 'bg-emerald-400' : opt.key === 'expense' ? 'bg-red-400' : 'bg-brand-accent'
                                                 }`} />
                                             )}
                                             {opt.label}
@@ -348,7 +348,7 @@ export default function Wallet() {
                                         <CalendarDays size={11} /> From
                                     </p>
                                     <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                                 </div>
 
                                 {/* Date to */}
@@ -357,7 +357,7 @@ export default function Wallet() {
                                         <CalendarDays size={11} /> To
                                     </p>
                                     <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                                 </div>
                             </div>
                         </div>
@@ -367,7 +367,7 @@ export default function Wallet() {
                     {hasFilters && filteredTransactions.length > 0 && (
                         <div className="flex flex-wrap gap-3 px-1">
                             <div className="flex items-center gap-1.5 text-xs font-black text-foreground/40">
-                                <span className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
                                 {filteredTransactions.length} of {sortedTransactions.length} shown
                             </div>
                             <div className="flex items-center gap-1.5 text-xs font-black text-emerald-400/70">
@@ -401,7 +401,7 @@ export default function Wallet() {
                         <Search size={36} className="mx-auto mb-3 opacity-20" />
                         <p className="font-black uppercase tracking-widest text-sm">No results found</p>
                         {hasFilters && (
-                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-gold/60 hover:text-brand-gold transition underline underline-offset-2">
+                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-accent/60 hover:text-brand-accent transition underline underline-offset-2">
                                 Clear all filters
                             </button>
                         )}
@@ -415,10 +415,10 @@ export default function Wallet() {
                             const member = data.members.find(m => m.id === tx.memberId);
                             const tc = TYPE_CONFIG[tx.type] || TYPE_CONFIG.income;
                             return (
-                                <div key={tx.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-gold/20 transition-all group">
+                                <div key={tx.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-accent/20 transition-all group">
                                     <div className="flex justify-between items-start gap-3 mb-3">
                                         <div className="min-w-0 flex-1">
-                                            <p className="font-black text-sm text-foreground truncate group-hover:text-brand-gold transition-colors">{tx.description}</p>
+                                            <p className="font-black text-sm text-foreground truncate group-hover:text-brand-accent transition-colors">{tx.description}</p>
                                             <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{tx.date}</p>
                                         </div>
                                         <p className={`font-black text-base whitespace-nowrap ${tx.type === 'expense' ? 'text-red-400' : 'text-emerald-400'}`}>
@@ -457,7 +457,7 @@ export default function Wallet() {
                                     const tc = TYPE_CONFIG[tx.type] || TYPE_CONFIG.income;
                                     return (
                                         <tr key={tx.id} className="hover:bg-background/40 transition-colors group">
-                                            <td className="p-4 font-bold text-foreground group-hover:text-brand-gold transition-colors max-w-[220px] truncate">{tx.description}</td>
+                                            <td className="p-4 font-bold text-foreground group-hover:text-brand-accent transition-colors max-w-[220px] truncate">{tx.description}</td>
                                             <td className="p-4 text-foreground/40 font-medium text-xs">{member ? member.name : <span className="text-foreground/20 italic">General</span>}</td>
                                             <td className="p-4 text-foreground/30 font-mono text-[11px]">{tx.date}</td>
                                             <td className="p-4">
@@ -494,7 +494,7 @@ export default function Wallet() {
                                 const page = i + 1;
                                 return (
                                     <button key={page} onClick={() => setCurrentPage(page)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-gold text-black' : 'text-foreground/30 hover:text-foreground/70'}`}>
+                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-accent text-background' : 'text-foreground/30 hover:text-foreground/70'}`}>
                                         {page}
                                     </button>
                                 );
@@ -525,7 +525,7 @@ export default function Wallet() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <TxFormFields formData={formData} setFormData={setFormData} members={data.members} />
                         <button disabled={isSaving} type="submit"
-                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            className="bg-brand-accent text-background p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Transaction'}
                         </button>
@@ -541,20 +541,20 @@ export default function Wallet() {
                                 <span className={`flex-shrink-0 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${tc.color}`}>{tc.label}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-1">Amount</p>
                                     <p className={`text-2xl font-black ${tx.type === 'expense' ? 'text-red-400' : 'text-emerald-400'}`}>
                                         {tx.type === 'expense' ? '-' : '+'}${Number(tx.amount).toLocaleString()}
                                     </p>
                                 </div>
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-1">Date</p>
                                     <p className="text-xl font-black text-foreground">{tx.date}</p>
                                 </div>
                             </div>
-                            <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                            <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                 <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-1">Contributor</p>
-                                <p className="text-base font-black text-brand-gold">{member?.name || 'General'}</p>
+                                <p className="text-base font-black text-brand-accent">{member?.name || 'General'}</p>
                             </div>
                         </div>
                     );

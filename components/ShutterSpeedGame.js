@@ -70,7 +70,7 @@ export default function ShutterSpeedGame() {
     // Calculate Rating & Badge
     const getRating = (ms) => {
         if (!ms) return { title: '', rating: '', color: '' };
-        if (ms < 220) return { title: '⚡ Insane Focus!', rating: '100% Sharp (1/8000s)', color: 'text-brand-gold border-brand-gold/40 bg-brand-gold/10' };
+        if (ms < 220) return { title: '⚡ Insane Focus!', rating: '100% Sharp (1/8000s)', color: 'text-brand-accent border-brand-accent/40 bg-brand-accent/10' };
         if (ms < 320) return { title: '🎯 Crisp Capture!', rating: '94% Sharp (1/4000s)', color: 'text-emerald-400 border-emerald-400/40 bg-emerald-400/10' };
         if (ms < 450) return { title: '📸 Good Shot!', rating: '82% Sharp (1/1000s)', color: 'text-sky-400 border-sky-400/40 bg-sky-400/10' };
         return { title: '🐢 Motion Blur!', rating: '50% Sharp (1/250s - Slow)', color: 'text-amber-400 border-amber-400/40 bg-amber-400/10' };
@@ -96,7 +96,7 @@ export default function ShutterSpeedGame() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                    <div className="w-8 h-8 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
                         <Zap size={16} />
                     </div>
                     <div>
@@ -107,10 +107,10 @@ export default function ShutterSpeedGame() {
 
                 {bestScore && (
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/20 text-brand-gold text-[10px] font-black">
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-[10px] font-black">
                             <Trophy size={12} /> Best: {bestScore}ms
                         </div>
-                        <button onClick={resetBestScore} title="Reset Best Score" className="text-foreground/30 hover:text-brand-gold transition p-1">
+                        <button onClick={resetBestScore} title="Reset Best Score" className="text-foreground/30 hover:text-brand-accent transition p-1">
                             <RefreshCw size={11} />
                         </button>
                     </div>
@@ -122,14 +122,14 @@ export default function ShutterSpeedGame() {
                 onClick={handleShutterClick}
                 className={`relative h-44 rounded-2xl border-2 flex flex-col items-center justify-center cursor-pointer select-none overflow-hidden transition-all duration-300 ${
                     gameState === 'idle'
-                        ? 'border-card-border bg-background/80 hover:border-brand-gold/30'
+                        ? 'border-card-border bg-background/80 hover:border-brand-accent/30'
                         : gameState === 'waiting'
                         ? 'border-amber-500/30 bg-amber-950/10'
                         : gameState === 'ready'
                         ? 'border-emerald-500 bg-emerald-950/30 glow-emerald'
                         : gameState === 'early'
                         ? 'border-red-500/50 bg-red-950/20'
-                        : 'border-brand-gold/40 bg-card-bg'
+                        : 'border-brand-accent/40 bg-card-bg'
                 }`}
             >
                 {/* Viewfinder Crosshair Grid Lines */}
@@ -149,7 +149,7 @@ export default function ShutterSpeedGame() {
                 {/* Game Contents per State */}
                 {gameState === 'idle' && (
                     <div className="text-center space-y-2 z-10 px-4">
-                        <div className="w-12 h-12 rounded-full bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center mx-auto text-brand-gold">
+                        <div className="w-12 h-12 rounded-full bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center mx-auto text-brand-accent">
                             <Camera size={22} />
                         </div>
                         <div>

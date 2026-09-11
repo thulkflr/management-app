@@ -93,13 +93,13 @@ export default function TaskModal({ task, onClose }) {
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
             <div className="absolute inset-0 bg-black/72 backdrop-blur-xl animate-in fade-in duration-200" onClick={onClose} />
             
-            <div className="relative bg-card-bg/95 backdrop-blur-2xl w-full max-w-5xl max-h-[92dvh] sm:max-h-[88vh] rounded-t-[2rem] sm:rounded-[28px] shadow-[0_32px_110px_rgba(0,0,0,0.62)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 slide-in-from-bottom-3 duration-300 border border-white/10">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/8 to-transparent" />
-                <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/45 to-transparent" />
+            <div className="relative bg-card-bg/95 backdrop-blur-2xl w-full max-w-5xl max-h-[92dvh] sm:max-h-[88vh] rounded-t-[2rem] sm:rounded-[28px] shadow-[0_32px_110px_rgba(0,0,0,0.62)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 slide-in-from-bottom-3 duration-300 border border-foreground/10">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-foreground/8 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/45 to-transparent" />
                 {/* Modal Header */}
-                <div className="relative z-10 p-5 md:p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.025]">
+                <div className="relative z-10 p-5 md:p-6 border-b border-foreground/10 flex items-center justify-between bg-foreground/[0.025]">
                     <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-2xl border shadow-lg shadow-black/10 ${isNew ? 'bg-brand-gold/12 border-brand-gold/25 text-brand-gold' : 'bg-white/5 border-white/10 text-brand-gold'}`}>
+                        <div className={`p-2.5 rounded-2xl border shadow-lg shadow-black/10 ${isNew ? 'bg-brand-accent/12 border-brand-accent/25 text-brand-accent' : 'bg-foreground/5 border-foreground/10 text-brand-accent'}`}>
                             <Tag size={20} />
                         </div>
                         <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight leading-tight">
@@ -117,7 +117,7 @@ export default function TaskModal({ task, onClose }) {
                         )}
                         <button 
                             onClick={onClose}
-                            className="p-2 text-foreground/45 hover:text-foreground hover:bg-white/8 rounded-xl border border-transparent hover:border-white/10 transition-all"
+                            className="p-2 text-foreground/45 hover:text-foreground hover:bg-foreground/8 rounded-xl border border-transparent hover:border-foreground/10 transition-all"
                         >
                             <X size={20} />
                         </button>
@@ -126,9 +126,9 @@ export default function TaskModal({ task, onClose }) {
 
                 <div className="relative z-10 flex-1 overflow-y-auto flex flex-col md:flex-row custom-scrollbar">
                     {/* Main Content Area */}
-                    <div className="flex-1 p-5 md:p-8 border-r border-white/8">
+                    <div className="flex-1 p-5 md:p-8 border-r border-foreground/8">
                         <div className="mb-8 overflow-x-auto scrollbar-hide">
-                            <div className="flex items-center gap-1 p-1 bg-white/[0.045] border border-white/8 rounded-2xl w-max shadow-inner">
+                            <div className="flex items-center gap-1 p-1 bg-foreground/[0.045] border border-foreground/8 rounded-2xl w-max shadow-inner">
                                 {[
                                     { id: 'details', label: 'Details' },
                                     { id: 'checklist', label: 'Checklist', count: formData.checklist.length },
@@ -140,13 +140,13 @@ export default function TaskModal({ task, onClose }) {
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
                                             activeTab === tab.id 
-                                            ? 'bg-brand-gold text-black shadow-lg shadow-brand-gold/20' 
-                                            : 'text-foreground/45 hover:text-foreground hover:bg-white/5'
+                                            ? 'bg-brand-accent text-background shadow-lg shadow-brand-accent/20' 
+                                            : 'text-foreground/45 hover:text-foreground hover:bg-foreground/5'
                                         }`}
                                     >
                                         {tab.label}
                                         {tab.count > 0 && (
-                                            <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-black/20' : 'bg-white/10'}`}>
+                                            <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-background/20' : 'bg-foreground/10'}`}>
                                                 {tab.count}
                                             </span>
                                         )}
@@ -165,7 +165,7 @@ export default function TaskModal({ task, onClose }) {
                                         value={formData.title}
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
                                         placeholder="What needs to be done?"
-                                        className="w-full text-xl md:text-2xl font-black text-foreground placeholder:text-foreground/25 bg-white/[0.035] border border-white/8 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold/50 transition"
+                                        className="w-full text-xl md:text-2xl font-black text-foreground placeholder:text-foreground/25 bg-foreground/[0.035] border border-foreground/8 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent/50 transition"
                                     />
                                 </div>
 
@@ -178,7 +178,7 @@ export default function TaskModal({ task, onClose }) {
                                         value={formData.description}
                                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                                         placeholder="Add more details about this task..."
-                                        className="w-full bg-white/[0.035] border border-white/10 rounded-2xl p-4 text-sm font-medium text-foreground placeholder:text-foreground/25 focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold/50 transition-all resize-none"
+                                        className="w-full bg-foreground/[0.035] border border-foreground/10 rounded-2xl p-4 text-sm font-medium text-foreground placeholder:text-foreground/25 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent/50 transition-all resize-none"
                                     />
                                 </div>
                             </form>
@@ -210,7 +210,7 @@ export default function TaskModal({ task, onClose }) {
                     </div>
 
                     {/* Sidebar Area */}
-                    <div className="w-full md:w-80 bg-white/[0.025] p-5 md:p-8 space-y-6 md:space-y-8 border-t md:border-t-0 border-white/8">
+                    <div className="w-full md:w-80 bg-foreground/[0.025] p-5 md:p-8 space-y-6 md:space-y-8 border-t md:border-t-0 border-foreground/8">
                         <div>
                             <label className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-foreground/45 mb-3 flex items-center gap-2">
                                 <Tag size={12} /> Status
@@ -268,13 +268,13 @@ export default function TaskModal({ task, onClose }) {
                                     type="date" 
                                     value={formData.dueDate}
                                     onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                                    className="w-full bg-background/70 border border-white/10 rounded-2xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold/50 transition-all cursor-pointer"
+                                    className="w-full bg-background/70 border border-foreground/10 rounded-2xl p-3 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent/50 transition-all cursor-pointer"
                                 />
                             </div>
                         </div>
 
                         {!isNew && (
-                            <div className="pt-4 border-t border-white/10">
+                            <div className="pt-4 border-t border-foreground/10">
                                 <p className="text-[9px] md:text-[10px] text-foreground/45 font-bold uppercase tracking-widest mb-1">Created At</p>
                                 <p className="text-xs text-foreground font-bold">{task.createdAt ? format(new Date(task.createdAt), 'PPP p') : '-'}</p>
                             </div>
@@ -283,10 +283,10 @@ export default function TaskModal({ task, onClose }) {
                 </div>
 
                 {/* Footer Actions */}
-                <div className="relative z-10 p-4 md:p-6 border-t border-white/10 bg-white/[0.025] flex justify-end gap-3">
+                <div className="relative z-10 p-4 md:p-6 border-t border-foreground/10 bg-foreground/[0.025] flex justify-end gap-3">
                     <button 
                         onClick={onClose}
-                        className="px-6 py-2.5 md:py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest text-foreground/50 hover:text-foreground bg-white/5 border border-white/8 hover:border-white/15 transition-all"
+                        className="px-6 py-2.5 md:py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest text-foreground/50 hover:text-foreground bg-foreground/5 border border-foreground/8 hover:border-foreground/15 transition-all"
                     >
                         Cancel
                     </button>
@@ -294,7 +294,7 @@ export default function TaskModal({ task, onClose }) {
                         type="button"
                         onClick={handleSubmit}
                         disabled={isSaving}
-                        className="flex items-center gap-2 bg-gradient-to-br from-[#e4c34f] to-brand-gold text-black px-6 md:px-8 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:hover:translate-y-0"
+                        className="flex items-center gap-2 bg-gradient-to-br from-brand-accent-bright to-brand-accent text-background px-6 md:px-8 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-brand-accent/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:hover:translate-y-0"
                     >
                         {isSaving && <Clock className="animate-spin" size={14} />}
                         {isNew ? 'Create Task' : 'Save Changes'}

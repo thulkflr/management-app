@@ -41,16 +41,16 @@ export default function CommentsSection({ taskId }) {
 
     return (
         <div className="mt-12 space-y-8">
-            <div className="flex items-center gap-3 border-b border-brand-gold/10 pb-4">
-                <MessageSquare className="text-brand-gold" size={20} />
-                <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">
+            <div className="flex items-center gap-3 border-b border-brand-accent/10 pb-4">
+                <MessageSquare className="text-brand-accent" size={20} />
+                <h3 className="font-black text-xs uppercase tracking-widest text-foreground">
                     Activity & Comments
                 </h3>
             </div>
 
             {/* Comment Form */}
             <form onSubmit={handleAddComment} className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent-slate flex items-center justify-center text-brand-gold border border-card-border flex-shrink-0 overflow-hidden shadow-lg">
+                <div className="w-10 h-10 rounded-xl bg-accent-slate flex items-center justify-center text-brand-accent border border-card-border flex-shrink-0 overflow-hidden shadow-lg">
                     {session?.user?.image ? (
                         <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
                     ) : (
@@ -63,12 +63,12 @@ export default function CommentsSection({ taskId }) {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
-                        className="w-full bg-accent-slate border border-card-border rounded-xl py-3 pl-4 pr-12 text-sm font-medium text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold transition-all resize-none min-h-[48px]"
+                        className="w-full bg-accent-slate border border-card-border rounded-xl py-3 pl-4 pr-12 text-sm font-medium text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent transition-all resize-none min-h-[48px]"
                     />
                     <button 
                         type="submit"
                         disabled={isSubmitting || !newComment.trim()}
-                        className="absolute right-2 top-2 p-1.5 bg-brand-gold text-black rounded-lg shadow-md hover:scale-110 active:scale-90 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100"
+                        className="absolute right-2 top-2 p-1.5 bg-brand-accent text-background rounded-lg shadow-md hover:scale-110 active:scale-90 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100"
                     >
                         <Send size={16} />
                     </button>

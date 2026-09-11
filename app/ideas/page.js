@@ -24,7 +24,7 @@ const StarRating = ({ value, onChange }) => (
     <div className="flex items-center gap-1.5 bg-background p-3 rounded-2xl border border-card-border">
         {[1, 2, 3, 4, 5].map(num => (
             <button key={num} type="button" onClick={() => onChange(num)}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${value >= num ? 'bg-brand-gold/20 text-brand-gold scale-110' : 'text-foreground/20 hover:text-brand-gold/60'}`}>
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${value >= num ? 'bg-brand-accent/20 text-brand-accent scale-110' : 'text-foreground/20 hover:text-brand-accent/60'}`}>
                 <Star size={18} fill={value >= num ? 'currentColor' : 'none'} />
             </button>
         ))}
@@ -38,20 +38,20 @@ const IdeaFormFields = ({ formData, setFormData }) => (
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Title</label>
                 <input required type="text" placeholder="e.g. Neon Night Portraits"
                     value={formData.title} onChange={e => setFormData(p => ({ ...p, title: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Contributed By</label>
                 <input type="text" placeholder="Your name"
                     value={formData.createdBy} onChange={e => setFormData(p => ({ ...p, createdBy: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
         </div>
         <div className="space-y-1.5">
             <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Concept</label>
             <textarea placeholder="Lighting setup, mood, visual references..."
                 value={formData.description} onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
-                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition h-28 resize-none text-sm font-bold" />
+                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition h-28 resize-none text-sm font-bold" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-1.5">
@@ -67,7 +67,7 @@ const IdeaFormFields = ({ formData, setFormData }) => (
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Tags</label>
                 <input type="text" placeholder="night, low-light, color..."
                     value={formData.tags} onChange={e => setFormData(p => ({ ...p, tags: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Potential (1–5)</label>
@@ -138,9 +138,9 @@ export default function Ideas() {
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
-            <div className="h-8 w-52 bg-brand-gold/10 rounded-xl" />
+            <div className="h-8 w-52 bg-brand-accent/10 rounded-xl" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1,2,3,4].map(i => <div key={i} className="h-48 bg-brand-gold/10 rounded-3xl" />)}
+                {[1,2,3,4].map(i => <div key={i} className="h-48 bg-brand-accent/10 rounded-3xl" />)}
             </div>
         </div>
     );
@@ -153,10 +153,10 @@ export default function Ideas() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                            <span className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent flex-shrink-0">
                                 <Lightbulb size={18} />
                             </span>
-                            Creative <span className="text-brand-gold italic">Ideas</span>
+                            Creative <span className="text-brand-accent italic">Ideas</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {(data.ideas || []).length} concept{(data.ideas || []).length !== 1 ? 's' : ''} cataloged
@@ -164,7 +164,7 @@ export default function Ideas() {
                     </div>
                     <button
                         onClick={() => { setShowForm(s => !s); setFormData(INITIAL_FORM_DATA); setModalConfig({ isOpen: false, type: null, data: null }); }}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-accent text-background px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         {showForm ? <X size={16} /> : <Plus size={16} />}
                         {showForm ? 'Cancel' : 'New Idea'}
@@ -191,8 +191,8 @@ export default function Ideas() {
                             <button key={cat} onClick={() => setActiveCategory(cat)}
                                 className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
                                     activeCategory === cat
-                                        ? 'bg-brand-gold text-black border-brand-gold shadow-lg shadow-brand-gold/20'
-                                        : 'border-card-border text-foreground/40 hover:border-brand-gold/30 hover:text-foreground/70'
+                                        ? 'bg-brand-accent text-background border-brand-accent shadow-lg shadow-brand-accent/20'
+                                        : 'border-card-border text-foreground/40 hover:border-brand-accent/30 hover:text-foreground/70'
                                 }`}>
                                 {cat}
                             </button>
@@ -209,16 +209,16 @@ export default function Ideas() {
                             <p className="text-xs mt-1 font-medium">Start capturing your creative vision.</p>
                         </div>
                     ) : filtered.map(idea => (
-                        <div key={idea.id} className="bg-card-bg rounded-3xl border border-card-border hover:border-brand-gold/25 hover:shadow-xl hover:shadow-brand-gold/5 transition-all duration-300 overflow-hidden group relative flex flex-col">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-brand-gold/4 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+                        <div key={idea.id} className="bg-card-bg rounded-3xl border border-card-border hover:border-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/5 transition-all duration-300 overflow-hidden group relative flex flex-col">
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-brand-accent/4 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700" />
 
                             <div className="p-5 flex flex-col flex-1 space-y-4">
                                 {/* Category + stars */}
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 bg-brand-gold/8 text-brand-gold text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-gold/15 italic">
+                                    <span className="px-2.5 py-1 bg-brand-accent/8 text-brand-accent text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-accent/15 italic">
                                         {idea.category}
                                     </span>
-                                    <div className="flex items-center gap-0.5 text-brand-gold/50">
+                                    <div className="flex items-center gap-0.5 text-brand-accent/50">
                                         {[...Array(5)].map((_, i) => (
                                             <Star key={i} size={11} fill={i < Number(idea.rating) ? 'currentColor' : 'none'} strokeWidth={1.5} />
                                         ))}
@@ -226,7 +226,7 @@ export default function Ideas() {
                                 </div>
 
                                 {/* Title */}
-                                <h3 className="font-black text-lg text-foreground group-hover:text-brand-gold transition-colors leading-snug">
+                                <h3 className="font-black text-lg text-foreground group-hover:text-brand-accent transition-colors leading-snug">
                                     {idea.title}
                                 </h3>
 
@@ -241,8 +241,8 @@ export default function Ideas() {
                                 {idea.tags && (
                                     <div className="flex flex-wrap gap-1.5">
                                         {String(idea.tags).split(',').filter(t => t.trim()).map((tag, idx) => (
-                                            <span key={idx} className="flex items-center gap-1 px-2 py-0.5 bg-white/4 text-foreground/35 text-[9px] font-black uppercase tracking-widest rounded-lg border border-card-border">
-                                                <Tag size={8} className="text-brand-gold/30" />
+                                            <span key={idx} className="flex items-center gap-1 px-2 py-0.5 bg-foreground/4 text-foreground/35 text-[9px] font-black uppercase tracking-widest rounded-lg border border-card-border">
+                                                <Tag size={8} className="text-brand-accent/30" />
                                                 {tag.trim()}
                                             </span>
                                         ))}
@@ -252,7 +252,7 @@ export default function Ideas() {
                                 {/* Footer */}
                                 <div className="mt-auto pt-4 border-t border-card-border flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold font-black text-[10px]">
+                                        <div className="w-6 h-6 rounded-lg bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent font-black text-[10px]">
                                             {idea.createdBy?.charAt(0)?.toUpperCase() || <User size={10} />}
                                         </div>
                                         <span className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">
@@ -283,7 +283,7 @@ export default function Ideas() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <IdeaFormFields formData={formData} setFormData={setFormData} />
                         <button disabled={isSaving} type="submit"
-                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            className="bg-brand-accent text-background p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Idea'}
                         </button>
@@ -295,38 +295,38 @@ export default function Ideas() {
                             <div className="flex justify-between items-start pb-5 border-b border-card-border">
                                 <div className="space-y-2 flex-1 pr-4">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="px-3 py-1 bg-brand-gold/10 text-brand-gold text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-gold/15 italic">
+                                        <span className="px-3 py-1 bg-brand-accent/10 text-brand-accent text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-accent/15 italic">
                                             {idea.category}
                                         </span>
-                                        <div className="flex text-brand-gold">
+                                        <div className="flex text-brand-accent">
                                             {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={i < Number(idea.rating) ? 'currentColor' : 'none'} />)}
                                         </div>
                                     </div>
                                     <h3 className="text-2xl font-black text-foreground leading-tight">{idea.title}</h3>
                                 </div>
-                                <div className="w-14 h-14 rounded-2xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center text-brand-gold flex-shrink-0">
+                                <div className="w-14 h-14 rounded-2xl bg-brand-accent/10 border border-brand-accent/15 flex items-center justify-center text-brand-accent flex-shrink-0">
                                     <Lightbulb size={26} />
                                 </div>
                             </div>
 
                             {idea.description && (
-                                <p className="text-sm text-foreground/60 leading-relaxed italic bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <p className="text-sm text-foreground/60 leading-relaxed italic bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     &quot;{idea.description}&quot;
                                 </p>
                             )}
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Creator</p>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold font-black text-sm">
+                                        <div className="w-8 h-8 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent font-black text-sm">
                                             {idea.createdBy?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
                                         <p className="text-sm font-black text-foreground">{idea.createdBy || 'Anonymous'}</p>
                                     </div>
                                 </div>
                                 {idea.tags && (
-                                    <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                    <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                         <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Keywords</p>
                                         <div className="flex flex-wrap gap-1">
                                             {String(idea.tags).split(',').filter(t => t.trim()).map((tag, idx) => (

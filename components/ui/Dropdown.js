@@ -137,12 +137,12 @@ export default function Dropdown({
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
                 onClick={() => (isOpen ? close() : open())}
-                className={`group flex min-h-[3rem] w-full items-center justify-between gap-3 rounded-2xl border border-card-border bg-background/80 px-4 py-3 text-left text-sm font-bold text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-200 hover:border-brand-gold/35 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-gold/25 disabled:cursor-not-allowed disabled:opacity-55 ${isOpen ? 'border-brand-gold/50 ring-2 ring-brand-gold/15' : ''}`}
+                className={`group flex min-h-[3rem] w-full items-center justify-between gap-3 rounded-2xl border border-card-border bg-background/80 px-4 py-3 text-left text-sm font-bold text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-200 hover:border-brand-accent/35 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-accent/25 disabled:cursor-not-allowed disabled:opacity-55 ${isOpen ? 'border-brand-accent/50 ring-2 ring-brand-accent/15' : ''}`}
             >
                 <span className={`min-w-0 truncate ${selectedOption ? 'text-foreground' : 'text-foreground/32'}`}>
                     {selectedOption?.label || placeholder}
                 </span>
-                <ChevronDown size={16} className={`flex-shrink-0 text-foreground/35 transition-transform duration-200 group-hover:text-brand-gold/70 ${isOpen ? 'rotate-180 text-brand-gold' : ''}`} />
+                <ChevronDown size={16} className={`flex-shrink-0 text-foreground/35 transition-transform duration-200 group-hover:text-brand-accent/70 ${isOpen ? 'rotate-180 text-brand-accent' : ''}`} />
             </button>
 
             <AnimatePresence>
@@ -152,10 +152,10 @@ export default function Dropdown({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.98 }}
                         transition={{ duration: 0.14, ease: 'easeOut' }}
-                        className={`absolute left-0 right-0 top-full z-[140] mt-2 overflow-hidden rounded-2xl border border-white/10 bg-card-bg/98 shadow-[0_22px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl ${panelClassName}`}
+                        className={`absolute left-0 right-0 top-full z-[140] mt-2 overflow-hidden rounded-2xl border border-foreground/10 bg-card-bg/98 shadow-[0_22px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl ${panelClassName}`}
                     >
                         {canSearch && (
-                            <div className="border-b border-white/8 p-2">
+                            <div className="border-b border-foreground/8 p-2">
                                 <div className="relative">
                                     <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
                                     <input
@@ -163,7 +163,7 @@ export default function Dropdown({
                                         value={query}
                                         onChange={event => setQuery(event.target.value)}
                                         placeholder="Search options..."
-                                        className="h-10 w-full rounded-xl border border-white/10 bg-background/70 pl-9 pr-3 text-sm font-bold text-foreground outline-none transition placeholder:text-foreground/25 focus:border-brand-gold/45 focus:ring-2 focus:ring-brand-gold/15"
+                                        className="h-10 w-full rounded-xl border border-foreground/10 bg-background/70 pl-9 pr-3 text-sm font-bold text-foreground outline-none transition placeholder:text-foreground/25 focus:border-brand-accent/45 focus:ring-2 focus:ring-brand-accent/15"
                                     />
                                 </div>
                             </div>
@@ -188,7 +188,7 @@ export default function Dropdown({
                                         data-active={active}
                                         onMouseEnter={() => setActiveIndex(index)}
                                         onClick={() => selectOption(option)}
-                                        className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selected ? 'bg-brand-gold/12 text-brand-gold' : active ? 'bg-white/8 text-foreground' : 'text-foreground/66 hover:bg-white/7 hover:text-foreground'}`}
+                                        className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selected ? 'bg-brand-accent/12 text-brand-accent' : active ? 'bg-foreground/8 text-foreground' : 'text-foreground/66 hover:bg-foreground/7 hover:text-foreground'}`}
                                     >
                                         <span className="min-w-0 truncate">{option.label}</span>
                                         {selected && <Check size={14} className="flex-shrink-0" />}

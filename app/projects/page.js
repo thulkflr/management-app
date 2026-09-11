@@ -24,7 +24,7 @@ const INITIAL_FORM_DATA = {
 };
 
 const STATUS_CONFIG = {
-    planned:     { label: 'Planned',     color: 'text-brand-gold   bg-brand-gold/10  border-brand-gold/20',  dot: 'bg-brand-gold'   },
+    planned:     { label: 'Planned',     color: 'text-brand-accent   bg-brand-accent/10  border-brand-accent/20',  dot: 'bg-brand-accent'   },
     in_progress: { label: 'In Progress', color: 'text-blue-400     bg-blue-400/10    border-blue-400/20',    dot: 'bg-blue-400'     },
     completed:   { label: 'Completed',   color: 'text-emerald-400  bg-emerald-400/10 border-emerald-400/20', dot: 'bg-emerald-400'  },
 };
@@ -38,20 +38,20 @@ const FormFields = ({ formData, setFormData }) => (
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Project Title</label>
                 <input required type="text" placeholder="e.g. Summer Wedding"
                     value={formData.title} onChange={e => setFormData(p => ({ ...p, title: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Photographer</label>
                 <input type="text" placeholder="Name"
                     value={formData.createdBy} onChange={e => setFormData(p => ({ ...p, createdBy: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
         </div>
         <div className="space-y-1.5">
             <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Description</label>
             <textarea placeholder="Project scope and details..." value={formData.description}
                 onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
-                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition h-24 resize-none text-sm font-bold" />
+                className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition h-24 resize-none text-sm font-bold" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="space-y-1.5">
@@ -79,7 +79,7 @@ const FormFields = ({ formData, setFormData }) => (
             <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Date & Time</label>
                 <input type="datetime-local" value={formData.date} onChange={e => setFormData(p => ({ ...p, date: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
         </div>
     </>
@@ -180,9 +180,9 @@ export default function Projects() {
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
-            <div className="h-8 w-48 bg-brand-gold/10 rounded-xl" />
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-24 bg-brand-gold/10 rounded-2xl" />)}</div>
-            <div className="h-64 bg-brand-gold/10 rounded-3xl" />
+            <div className="h-8 w-48 bg-brand-accent/10 rounded-xl" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-24 bg-brand-accent/10 rounded-2xl" />)}</div>
+            <div className="h-64 bg-brand-accent/10 rounded-3xl" />
         </div>
     );
 
@@ -196,10 +196,10 @@ export default function Projects() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                            <span className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent flex-shrink-0">
                                 <Camera size={18} />
                             </span>
-                            Project <span className="text-brand-gold italic">Hub</span>
+                            Project <span className="text-brand-accent italic">Hub</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {stats.total} total · {stats.active} active
@@ -207,7 +207,7 @@ export default function Projects() {
                     </div>
                     <button
                         onClick={() => { setShowForm(s => !s); setFormData(INITIAL_FORM_DATA); setModalConfig({ isOpen: false, type: null, data: null }); }}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-accent text-background px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         {showForm ? <X size={16} /> : <Plus size={16} />}
                         {showForm ? 'Cancel' : 'New Project'}
@@ -225,10 +225,10 @@ export default function Projects() {
                     </div>
                     <div className="bg-card-bg p-4 rounded-2xl border border-card-border">
                         <div className="flex items-center gap-2 mb-2">
-                            <Tag size={14} className="text-brand-gold" />
+                            <Tag size={14} className="text-brand-accent" />
                             <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Planned</p>
                         </div>
-                        <p className="text-xl font-black text-brand-gold">{stats.planned}</p>
+                        <p className="text-xl font-black text-brand-accent">{stats.planned}</p>
                     </div>
                     <div className="bg-card-bg p-4 rounded-2xl border border-card-border">
                         <div className="flex items-center gap-2 mb-2">
@@ -269,7 +269,7 @@ export default function Projects() {
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
                                 placeholder="Search projects..."
-                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold"
+                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold"
                             />
                             {query && (
                                 <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/70 transition">
@@ -282,13 +282,13 @@ export default function Projects() {
                         <button onClick={() => setShowFilters(s => !s)}
                             className={`relative flex items-center gap-2 px-4 py-3 rounded-2xl border font-black text-sm transition-all ${
                                 showFilters || hasFilters
-                                    ? 'bg-brand-gold text-black border-brand-gold shadow-lg shadow-brand-gold/20'
-                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-gold/30'
+                                    ? 'bg-brand-accent text-background border-brand-accent shadow-lg shadow-brand-accent/20'
+                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-accent/30'
                             }`}>
                             <SlidersHorizontal size={15} />
                             <span className="hidden sm:inline">Filters</span>
                             {activeCount > 0 && (
-                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-gold text-black'}`}>
+                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-accent text-background'}`}>
                                     {activeCount}
                                 </span>
                             )}
@@ -319,8 +319,8 @@ export default function Projects() {
                                         <button key={opt.key} onClick={() => setStatusFilter(opt.key)}
                                             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
                                                 statusFilter === opt.key
-                                                    ? 'bg-brand-gold text-black border-brand-gold'
-                                                    : 'border-card-border text-foreground/40 hover:border-brand-gold/30 hover:text-foreground/70'
+                                                    ? 'bg-brand-accent text-background border-brand-accent'
+                                                    : 'border-card-border text-foreground/40 hover:border-brand-accent/30 hover:text-foreground/70'
                                             }`}>
                                             {opt.key !== 'all' && (
                                                 <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${STATUS_CONFIG[opt.key]?.dot || 'bg-foreground/30'}`} />
@@ -351,7 +351,7 @@ export default function Projects() {
                                         <CalendarDays size={11} /> From
                                     </p>
                                     <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                                 </div>
 
                                 {/* Date to */}
@@ -360,7 +360,7 @@ export default function Projects() {
                                         <CalendarDays size={11} /> To
                                     </p>
                                     <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                                        className="block w-full rounded-xl border border-card-border px-3 py-2.5 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                                 </div>
                             </div>
                         </div>
@@ -390,7 +390,7 @@ export default function Projects() {
                         <Search size={36} className="mx-auto mb-3 opacity-20" />
                         <p className="font-black uppercase tracking-widest text-sm">No results found</p>
                         {hasFilters && (
-                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-gold/60 hover:text-brand-gold transition underline underline-offset-2">
+                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-accent/60 hover:text-brand-accent transition underline underline-offset-2">
                                 Clear all filters
                             </button>
                         )}
@@ -402,11 +402,11 @@ export default function Projects() {
                             {paginated.map(project => {
                                 const st = STATUS_CONFIG[project.status] || STATUS_CONFIG.planned;
                                 return (
-                                    <div key={project.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-gold/20 transition-all group">
+                                    <div key={project.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-accent/20 transition-all group">
                                         <div className="flex justify-between items-start gap-3 mb-3">
                                             <div className="min-w-0 flex-1">
-                                                <p className="font-black text-sm text-foreground truncate group-hover:text-brand-gold transition-colors">{project.title}</p>
-                                                <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2 py-0.5 rounded border border-brand-gold/15 italic">{project.category}</span>
+                                                <p className="font-black text-sm text-foreground truncate group-hover:text-brand-accent transition-colors">{project.title}</p>
+                                                <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest text-brand-accent bg-brand-accent/8 px-2 py-0.5 rounded border border-brand-accent/15 italic">{project.category}</span>
                                             </div>
                                             <span className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${st.color}`}>{st.label}</span>
                                         </div>
@@ -437,8 +437,8 @@ export default function Projects() {
                                         return (
                                             <tr key={project.id} className="hover:bg-background/40 transition-colors group">
                                                 <td className="p-4 max-w-[260px]">
-                                                    <p className="font-bold text-foreground group-hover:text-brand-gold transition-colors truncate">{project.title}</p>
-                                                    <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2 py-0.5 rounded border border-brand-gold/15 italic">{project.category}</span>
+                                                    <p className="font-bold text-foreground group-hover:text-brand-accent transition-colors truncate">{project.title}</p>
+                                                    <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest text-brand-accent bg-brand-accent/8 px-2 py-0.5 rounded border border-brand-accent/15 italic">{project.category}</span>
                                                 </td>
                                                 <td className="p-4 text-foreground/40 font-medium text-xs">
                                                     {project.createdBy || <span className="text-foreground/20 italic">Unassigned</span>}
@@ -476,7 +476,7 @@ export default function Projects() {
                                 const page = i + 1;
                                 return (
                                     <button key={page} onClick={() => setCurrentPage(page)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-gold text-black' : 'text-foreground/30 hover:text-foreground/70'}`}>
+                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-accent text-background' : 'text-foreground/30 hover:text-foreground/70'}`}>
                                         {page}
                                     </button>
                                 );
@@ -507,7 +507,7 @@ export default function Projects() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <FormFields formData={formData} setFormData={setFormData} />
                         <button disabled={isSaving} type="submit"
-                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            className="bg-brand-accent text-background p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Project'}
                         </button>
@@ -520,25 +520,25 @@ export default function Projects() {
                                 <div className="space-y-2">
                                     <h3 className="text-2xl font-black text-foreground leading-tight">{modalConfig.data.title}</h3>
                                     <div className="flex items-center gap-2">
-                                        <span className="px-3 py-1 bg-brand-gold/10 text-brand-gold text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-gold/15 italic">{modalConfig.data.category}</span>
+                                        <span className="px-3 py-1 bg-brand-accent/10 text-brand-accent text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-accent/15 italic">{modalConfig.data.category}</span>
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${st.color}`}>{st.label}</span>
                                     </div>
                                 </div>
-                                <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center text-brand-gold">
+                                <div className="w-12 h-12 rounded-2xl bg-brand-accent/10 border border-brand-accent/15 flex items-center justify-center text-brand-accent">
                                     <Camera size={22} />
                                 </div>
                             </div>
                             {modalConfig.data.description && (
-                                <p className="text-sm text-foreground/60 leading-relaxed italic bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <p className="text-sm text-foreground/60 leading-relaxed italic bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     &quot;{modalConfig.data.description}&quot;
                                 </p>
                             )}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-1">Photographer</p>
-                                    <p className="text-sm font-black text-brand-gold">{modalConfig.data.createdBy || '—'}</p>
+                                    <p className="text-sm font-black text-brand-accent">{modalConfig.data.createdBy || '—'}</p>
                                 </div>
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-1">Date</p>
                                     <p className="text-sm font-black text-foreground">{formatDate(modalConfig.data.date)}</p>
                                 </div>

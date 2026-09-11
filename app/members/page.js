@@ -28,13 +28,13 @@ function MemberForm({ formData, setFormData }) {
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Full Name</label>
                     <input required type="text" placeholder="e.g. Ahmad Khaled"
                         value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Role</label>
                     <input type="text" list="roles-list" placeholder="e.g. Photographer"
                         value={formData.role} onChange={e => setFormData(p => ({ ...p, role: e.target.value }))}
-                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                        className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
                     <datalist id="roles-list">{ROLES.map(r => <option key={r} value={r} />)}</datalist>
                 </div>
             </div>
@@ -42,7 +42,7 @@ function MemberForm({ formData, setFormData }) {
                 <label className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">Email</label>
                 <input type="email" placeholder="member@example.com"
                     value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold" />
+                    className="block w-full rounded-2xl border border-card-border p-4 bg-background focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold" />
             </div>
         </div>
     );
@@ -156,11 +156,11 @@ export default function Members() {
 
     if (loading) return (
         <div className="h-full p-6 md:p-8 space-y-6 animate-pulse">
-            <div className="h-8 w-40 bg-brand-gold/10 rounded-xl" />
+            <div className="h-8 w-40 bg-brand-accent/10 rounded-xl" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[1,2,3].map(i => <div key={i} className="h-24 bg-brand-gold/10 rounded-2xl" />)}
+                {[1,2,3].map(i => <div key={i} className="h-24 bg-brand-accent/10 rounded-2xl" />)}
             </div>
-            <div className="h-64 bg-brand-gold/10 rounded-3xl" />
+            <div className="h-64 bg-brand-accent/10 rounded-3xl" />
         </div>
     );
 
@@ -172,10 +172,10 @@ export default function Members() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            <span className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold flex-shrink-0">
+                            <span className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent flex-shrink-0">
                                 <Users2 size={18} />
                             </span>
-                            Team <span className="text-brand-gold italic">Members</span>
+                            Team <span className="text-brand-accent italic">Members</span>
                         </h1>
                         <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mt-1 ml-12">
                             {data.members.length} members · ${totalInvestedCapital.toLocaleString()} invested capital
@@ -183,7 +183,7 @@ export default function Members() {
                     </div>
                     <button
                         onClick={() => { setShowForm(s => !s); setFormData(INITIAL_FORM); setModalConfig({ isOpen: false, type: null, data: null }); }}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-accent text-background px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-brand-accent/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         {showForm ? <X size={16} /> : <Plus size={16} />}
                         {showForm ? 'Cancel' : 'New Member'}
@@ -194,17 +194,17 @@ export default function Members() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="bg-card-bg p-4 rounded-2xl border border-card-border">
                         <div className="flex items-center gap-2 mb-2">
-                            <Users2 size={14} className="text-brand-gold" />
+                            <Users2 size={14} className="text-brand-accent" />
                             <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Members</p>
                         </div>
                         <p className="text-xl font-black text-foreground">{data.members.length}</p>
                     </div>
                     <div className="bg-card-bg p-4 rounded-2xl border border-card-border">
                         <div className="flex items-center gap-2 mb-2">
-                            <Landmark size={14} className="text-brand-gold" />
+                            <Landmark size={14} className="text-brand-accent" />
                             <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest">Capital Invested</p>
                         </div>
-                        <p className="text-xl font-black text-brand-gold">${totalInvestedCapital.toLocaleString()}</p>
+                        <p className="text-xl font-black text-brand-accent">${totalInvestedCapital.toLocaleString()}</p>
                     </div>
                     <div className={`p-4 rounded-2xl ${netProfit >= 0 ? 'bg-emerald-500/15 border border-emerald-500/20' : 'bg-red-500/15 border border-red-500/20'}`}>
                         <div className="flex items-center gap-2 mb-2">
@@ -238,7 +238,7 @@ export default function Members() {
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
                                 placeholder="Search members..."
-                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-gold outline-none transition text-sm font-bold"
+                                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-card-border bg-card-bg focus:ring-2 focus:ring-brand-accent outline-none transition text-sm font-bold"
                             />
                             {query && (
                                 <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/70 transition">
@@ -251,13 +251,13 @@ export default function Members() {
                         <button onClick={() => setShowFilters(s => !s)}
                             className={`relative flex items-center gap-2 px-4 py-3 rounded-2xl border font-black text-sm transition-all ${
                                 showFilters || hasFilters
-                                    ? 'bg-brand-gold text-black border-brand-gold shadow-lg shadow-brand-gold/20'
-                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-gold/30'
+                                    ? 'bg-brand-accent text-background border-brand-accent shadow-lg shadow-brand-accent/20'
+                                    : 'border-card-border text-foreground/50 bg-card-bg hover:border-brand-accent/30'
                             }`}>
                             <SlidersHorizontal size={15} />
                             <span className="hidden sm:inline">Filters</span>
                             {activeCount > 0 && (
-                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-gold text-black'}`}>
+                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${showFilters || hasFilters ? 'bg-black/20 text-black' : 'bg-brand-accent text-background'}`}>
                                     {activeCount}
                                 </span>
                             )}
@@ -312,7 +312,7 @@ export default function Members() {
                         <Search size={36} className="mx-auto mb-3 opacity-20" />
                         <p className="font-black uppercase tracking-widest text-sm">No results found</p>
                         {hasFilters && (
-                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-gold/60 hover:text-brand-gold transition underline underline-offset-2">
+                            <button onClick={clearFilters} className="mt-4 text-xs font-black text-brand-accent/60 hover:text-brand-accent transition underline underline-offset-2">
                                 Clear all filters
                             </button>
                         )}
@@ -326,13 +326,13 @@ export default function Members() {
                                 const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
                                 const profitAmount = distribution.profit;
                                 return (
-                                    <div key={member.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-gold/20 transition-all group">
+                                    <div key={member.id} className="bg-card-bg p-4 rounded-2xl border border-card-border hover:border-brand-accent/20 transition-all group">
                                         <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-11 h-11 rounded-xl bg-brand-gold/10 border border-brand-gold/20 text-brand-gold flex items-center justify-center text-sm font-black flex-shrink-0">
+                                            <div className="w-11 h-11 rounded-xl bg-brand-accent/10 border border-brand-accent/20 text-brand-accent flex items-center justify-center text-sm font-black flex-shrink-0">
                                                 {member.name?.charAt(0)?.toUpperCase()}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="font-black text-sm text-foreground truncate group-hover:text-brand-gold transition-colors">{member.name}</p>
+                                                <p className="font-black text-sm text-foreground truncate group-hover:text-brand-accent transition-colors">{member.name}</p>
                                                 <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{member.role || 'Partner'}</p>
                                             </div>
                                             <p className={`font-black text-sm whitespace-nowrap ${profitAmount >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -367,11 +367,11 @@ export default function Members() {
                                             <tr key={member.id} className="hover:bg-background/40 transition-colors group">
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/20 text-brand-gold flex items-center justify-center text-xs font-black flex-shrink-0">
+                                                        <div className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/20 text-brand-accent flex items-center justify-center text-xs font-black flex-shrink-0">
                                                             {member.name?.charAt(0)?.toUpperCase()}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="font-bold text-foreground group-hover:text-brand-gold transition-colors truncate">{member.name}</p>
+                                                            <p className="font-bold text-foreground group-hover:text-brand-accent transition-colors truncate">{member.name}</p>
                                                             {member.email && (
                                                                 <div className="flex items-center gap-1 mt-0.5">
                                                                     <Mail size={9} className="text-foreground/20 flex-shrink-0" />
@@ -382,15 +382,15 @@ export default function Members() {
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                    <span className="inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border text-foreground/50 bg-white/3 border-card-border">
+                                                    <span className="inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border text-foreground/50 bg-foreground/3 border-card-border">
                                                         {member.role || 'Partner'}
                                                     </span>
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-black text-brand-gold w-10 flex-shrink-0">{capitalPercentage}%</span>
+                                                        <span className="text-xs font-black text-brand-accent w-10 flex-shrink-0">{capitalPercentage}%</span>
                                                         <div className="h-1.5 w-24 rounded-full bg-background border border-card-border overflow-hidden">
-                                                            <div className="h-full bg-brand-gold rounded-full transition-all duration-500" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
+                                                            <div className="h-full bg-brand-accent rounded-full transition-all duration-500" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
                                                         </div>
                                                     </div>
                                                 </td>
@@ -423,7 +423,7 @@ export default function Members() {
                                 const page = i + 1;
                                 return (
                                     <button key={page} onClick={() => setCurrentPage(page)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-gold text-black' : 'text-foreground/30 hover:text-foreground/70'}`}>
+                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === page ? 'bg-brand-accent text-background' : 'text-foreground/30 hover:text-foreground/70'}`}>
                                         {page}
                                     </button>
                                 );
@@ -454,7 +454,7 @@ export default function Members() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <MemberForm formData={formData} setFormData={setFormData} />
                         <button disabled={isSaving} type="submit"
-                            className="bg-brand-gold text-black p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                            className="bg-brand-accent text-background p-4 rounded-2xl w-full font-black shadow-lg hover:opacity-90 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving && <Loader size={16} />}
                             {isSaving ? 'Updating...' : 'Update Member'}
                         </button>
@@ -467,7 +467,7 @@ export default function Members() {
                     return (
                         <div className="space-y-5">
                             <div className="flex items-center gap-4 pb-5 border-b border-card-border">
-                                <div className="w-20 h-20 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 text-brand-gold flex items-center justify-center text-3xl font-black">
+                                <div className="w-20 h-20 rounded-2xl bg-brand-accent/10 border border-brand-accent/20 text-brand-accent flex items-center justify-center text-3xl font-black">
                                     {m.name?.charAt(0)?.toUpperCase()}
                                 </div>
                                 <div>
@@ -475,21 +475,21 @@ export default function Members() {
                                     <p className="text-foreground/40 font-black text-[10px] uppercase tracking-widest">{m.role || 'Partner'}</p>
                                     {m.email && (
                                         <div className="flex items-center gap-1.5 mt-1.5">
-                                            <Mail size={12} className="text-brand-gold/50" />
+                                            <Mail size={12} className="text-brand-accent/50" />
                                             <p className="text-xs text-foreground/50 font-medium">{m.email}</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Profit Share</p>
-                                    <p className="text-2xl font-black text-brand-gold">{capitalPercentage}%</p>
+                                    <p className="text-2xl font-black text-brand-accent">{capitalPercentage}%</p>
                                     <div className="mt-2 h-1 rounded-full bg-background border border-card-border overflow-hidden">
-                                        <div className="h-full bg-brand-gold" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
+                                        <div className="h-full bg-brand-accent" style={{ width: `${Math.min(capitalPercentage, 100)}%` }} />
                                     </div>
                                 </div>
-                                <div className="bg-white/3 p-4 rounded-2xl border border-card-border">
+                                <div className="bg-foreground/3 p-4 rounded-2xl border border-card-border">
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-widest mb-2">Estimated Balance</p>
                                     <p className={`text-2xl font-black ${profitAmount >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
                                         ${profitAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}

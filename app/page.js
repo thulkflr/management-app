@@ -46,7 +46,7 @@ const IDEA_COLORS = {
     'Done': '#10b981', 'Approved': '#10b981',
     'Archived': '#6b7280', 'Rejected': '#ef4444',
 };
-const fallbackColor = '#c5a022';
+const fallbackColor = '#4A1117';
 
 // ── GrowthChart (SVG) ───────────────────────────────────────────────────────
 function GrowthChart({ transactions = [] }) {
@@ -187,7 +187,7 @@ function StatusBreakdown({ items = [], colorMap = {}, emptyText = 'No data' }) {
 
     return (
         <div className="space-y-3">
-            <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-white/5 p-0.5 gap-0.5">
+            <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-foreground/5 p-0.5 gap-0.5">
                 {counts.map(([status, count]) => {
                     const color = colorMap[status] || fallbackColor;
                     const pct = ((count / total) * 100).toFixed(1);
@@ -236,17 +236,17 @@ function RecentTransactions({ transactions = [] }) {
                 const isCapital = tx.type === 'capital';
                 const amt = Math.abs(Number(String(tx.amount).replace(/[^0-9.-]+/g, '')) || 0);
                 return (
-                    <div key={tx.id || Math.random()} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
+                    <div key={tx.id || Math.random()} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-accent/20 transition-colors group">
                         <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-black text-xs ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : isCapital ? 'bg-brand-gold/10 text-brand-gold border border-brand-gold/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-black text-xs ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : isCapital ? 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                                 {isIncome ? <ArrowUpRight size={14} /> : isCapital ? <Wallet size={14} /> : <ArrowDownRight size={14} />}
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-foreground leading-none mb-1 group-hover:text-brand-gold transition-colors">{tx.category || tx.description || 'Transaction'}</p>
+                                <p className="text-xs font-bold text-foreground leading-none mb-1 group-hover:text-brand-accent transition-colors">{tx.category || tx.description || 'Transaction'}</p>
                                 <p className="text-[9px] text-foreground/30 font-medium">{tx.date ? new Date(tx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—'}</p>
                             </div>
                         </div>
-                        <span className={`text-xs font-black tabular ${isIncome ? 'text-emerald-400' : isCapital ? 'text-brand-gold' : 'text-foreground/70'}`}>
+                        <span className={`text-xs font-black tabular ${isIncome ? 'text-emerald-400' : isCapital ? 'text-brand-accent' : 'text-foreground/70'}`}>
                             {tx.type === 'expense' ? '-' : '+'}${amt.toLocaleString()}
                         </span>
                     </div>
@@ -271,12 +271,12 @@ function RecentProjects({ projects = [] }) {
             {recent.map(p => {
                 const color = PROJECT_COLORS[p.status] || fallbackColor;
                 return (
-                    <div key={p.id || Math.random()} className="p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group flex items-center justify-between gap-3">
+                    <div key={p.id || Math.random()} className="p-3 rounded-xl bg-background border border-card-border hover:border-brand-accent/20 transition-colors group flex items-center justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-brand-gold transition-colors">{p.title}</h4>
+                            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-brand-accent transition-colors">{p.title}</h4>
                             <p className="text-[9px] text-foreground/35 font-medium mt-0.5">{p.category || 'General'}</p>
                         </div>
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded border border-white/5 flex-shrink-0" style={{ color, backgroundColor: `${color}15` }}>
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded border border-foreground/5 flex-shrink-0" style={{ color, backgroundColor: `${color}15` }}>
                             {p.status || 'Active'}
                         </span>
                     </div>
@@ -299,13 +299,13 @@ function ChecklistProgress({ checklist = [] }) {
                     <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">Gear Checklist</p>
                     <p className="text-xl font-black text-foreground tracking-tight mt-0.5">{completed} <span className="text-xs font-normal text-foreground/40">/ {total} items ready</span></p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center font-black text-brand-gold text-sm shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center font-black text-brand-accent text-sm shadow-inner">
                     {pct}%
                 </div>
             </div>
 
-            <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden p-0.5 border border-white/5">
-                <div className="bg-gradient-to-r from-brand-gold/70 to-brand-gold h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+            <div className="w-full bg-foreground/5 h-2 rounded-full overflow-hidden p-0.5 border border-foreground/5">
+                <div className="bg-gradient-to-r from-brand-accent/70 to-brand-accent h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
             </div>
 
             <div className="space-y-2 pt-1">
@@ -353,16 +353,16 @@ function UpcomingShootBanner({ projects = [] }) {
         : '';
 
     return (
-        <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-brand-gold/25 bg-gradient-to-br from-brand-gold/12 via-card-bg to-card-bg p-6 md:p-7 shadow-2xl">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+        <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-brand-accent/25 bg-gradient-to-br from-brand-accent/12 via-card-bg to-card-bg p-6 md:p-7 shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
                 <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-brand-gold flex-shrink-0 shadow-lg shadow-brand-gold/10">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-accent/20 border border-brand-accent/30 flex items-center justify-center text-brand-accent flex-shrink-0 shadow-lg shadow-brand-accent/10">
                         <Camera size={24} />
                     </div>
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2.5 py-0.5 rounded-full bg-brand-gold/15 text-brand-gold text-[9px] font-black uppercase tracking-widest border border-brand-gold/25">
+                            <span className="px-2.5 py-0.5 rounded-full bg-brand-accent/15 text-brand-accent text-[9px] font-black uppercase tracking-widest border border-brand-accent/25">
                                 Next Scheduled Session
                             </span>
                             <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">
@@ -373,7 +373,7 @@ function UpcomingShootBanner({ projects = [] }) {
                             {upcoming.title}
                         </h3>
                         <div className="flex items-center gap-4 text-xs font-bold text-foreground/60 pt-0.5 flex-wrap">
-                            <span className="flex items-center gap-1.5 text-brand-gold font-black">
+                            <span className="flex items-center gap-1.5 text-brand-accent font-black">
                                 <Calendar size={13} /> {dateFormatted} {timeFormatted ? `at ${timeFormatted}` : ''}
                             </span>
                             {upcoming.createdBy && (
@@ -386,7 +386,7 @@ function UpcomingShootBanner({ projects = [] }) {
                 </div>
                 <Link
                     href="/projects"
-                    className="flex items-center gap-2 bg-brand-gold text-black px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-gold/20 hover:scale-[1.03] active:scale-95 transition-all self-stretch md:self-auto justify-center"
+                    className="flex items-center gap-2 bg-brand-accent text-background px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-accent/20 hover:scale-[1.03] active:scale-95 transition-all self-stretch md:self-auto justify-center"
                 >
                     View Projects <ArrowRight size={14} />
                 </Link>
@@ -397,7 +397,7 @@ function UpcomingShootBanner({ projects = [] }) {
 
 function QuickLaunchpad() {
     const shortcuts = [
-        { label: 'Project Hub', desc: 'Active shoots & events', href: '/projects', icon: FolderKanban, color: 'text-brand-gold', bg: 'bg-brand-gold/10', border: 'border-brand-gold/20' },
+        { label: 'Project Hub', desc: 'Active shoots & events', href: '/projects', icon: FolderKanban, color: 'text-brand-accent', bg: 'bg-brand-accent/10', border: 'border-brand-accent/20' },
         { label: 'Creative Ideas', desc: 'Explore concept catalog', href: '/ideas', icon: Lightbulb, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' },
         { label: 'Gear Checklist', desc: 'Equipment readiness', href: '/checklist', icon: CheckSquare, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
         { label: 'Tasks Board', desc: 'Production workflow', href: '/tasks', icon: Zap, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
@@ -407,7 +407,7 @@ function QuickLaunchpad() {
         <motion.div variants={fadeUp} className="space-y-3">
             <div className="flex items-center justify-between">
                 <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
-                    <Sparkles size={13} className="text-brand-gold" /> Studio Quick Launchpad
+                    <Sparkles size={13} className="text-brand-accent" /> Studio Quick Launchpad
                 </h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -421,10 +421,10 @@ function QuickLaunchpad() {
                                 <div className={`w-9 h-9 rounded-xl ${sc.bg} border ${sc.border} flex items-center justify-center ${sc.color} group-hover:scale-110 transition-transform`}>
                                     <Icon size={18} />
                                 </div>
-                                <ArrowUpRight size={14} className="text-foreground/20 group-hover:text-brand-gold group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                                <ArrowUpRight size={14} className="text-foreground/20 group-hover:text-brand-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                             </div>
                             <div>
-                                <h3 className="font-black text-sm text-foreground group-hover:text-brand-gold transition-colors leading-tight">
+                                <h3 className="font-black text-sm text-foreground group-hover:text-brand-accent transition-colors leading-tight">
                                     {sc.label}
                                 </h3>
                                 <p className="text-[9px] font-bold text-foreground/35 mt-0.5 leading-snug">
@@ -464,7 +464,7 @@ function ArcadeZone() {
                         onClick={() => setActiveTab('shutter')}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
                             activeTab === 'shutter'
-                                ? 'bg-brand-gold text-black shadow-md shadow-brand-gold/20'
+                                ? 'bg-brand-accent text-background shadow-md shadow-brand-accent/20'
                                 : 'text-foreground/40 hover:text-foreground'
                         }`}
                     >
@@ -513,7 +513,7 @@ export default function Dashboard() {
         const gearPct = totalChecklist === 0 ? 0 : Math.round((doneChecklist / totalChecklist) * 100);
 
         return [
-            { label: 'Active Shoots', value: activeProjectsCount, icon: FolderKanban, color: 'text-brand-gold', accent: 'var(--brand-gold)', note: 'Shoots in pipeline' },
+            { label: 'Active Shoots', value: activeProjectsCount, icon: FolderKanban, color: 'text-brand-accent', accent: 'var(--brand-accent)', note: 'Shoots in pipeline' },
             { label: 'Gear Readiness', value: gearPct, isPct: true, icon: CheckSquare, color: 'text-emerald-400', accent: '#10b981', note: `${doneChecklist}/${totalChecklist} items ready` },
             { label: 'Creative Ideas', value: ideasList.length, icon: Lightbulb, color: 'text-amber-400', accent: '#f59e0b', note: 'Cataloged concepts' },
             { label: 'Total Sessions', value: projectsList.length, icon: Camera, color: 'text-sky-400', accent: '#38bdf8', note: 'All-time projects' },
@@ -539,11 +539,11 @@ export default function Dashboard() {
     const financialKpis = [
         { label: 'Revenue',    value: totalIncome,    icon: TrendingUp,   color: 'text-emerald-400', accent: '#10b981', note: 'Total income' },
         { label: 'Expenses',   value: totalExpenses,  icon: TrendingDown, color: 'text-red-400',     accent: '#ef4444', note: 'Total costs' },
-        { label: 'Capital',    value: totalCapital,   icon: Users,        color: 'text-brand-gold',  accent: 'var(--brand-gold)', note: 'Partner fund' },
+        { label: 'Capital',    value: totalCapital,   icon: Users,        color: 'text-brand-accent',  accent: 'var(--brand-accent)', note: 'Partner fund' },
         { label: 'Cash',       value: remainingMoney, icon: Wallet,       color: 'text-sky-400',     accent: '#38bdf8', note: 'On hand' },
         { label: 'Net Profit', value: netProfit,      icon: BarChart3,
-          color: netProfit >= 0 ? 'text-brand-gold' : 'text-red-400',
-          accent: netProfit >= 0 ? 'var(--brand-gold)' : '#ef4444',
+          color: netProfit >= 0 ? 'text-brand-accent' : 'text-red-400',
+          accent: netProfit >= 0 ? 'var(--brand-accent)' : '#ef4444',
           note: netProfit >= 0 ? 'Positive return' : 'Loss territory',
           hero: true },
     ];
@@ -559,11 +559,11 @@ export default function Dashboard() {
                             {greeting}{firstName ? `, ${firstName}` : ''}
                         </p>
                         <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-                            {isAdmin ? 'Business' : 'Studio'} <span className="text-brand-gold italic">Overview</span>
+                            {isAdmin ? 'Business' : 'Studio'} <span className="text-brand-accent italic">Overview</span>
                         </h1>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${isAdmin ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}`}>
+                        <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${isAdmin ? 'bg-brand-accent/10 text-brand-accent border-brand-accent/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}`}>
                             {isAdmin ? '🛡️ Admin Workspace' : '📸 Member Studio'}
                         </span>
                     </div>
@@ -577,10 +577,10 @@ export default function Dashboard() {
                             const absVal = Math.abs(kpi.value);
                             return (
                                 <motion.div key={kpi.label} variants={fadeUp}
-                                    className={`relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-gold/20 ${kpi.hero ? 'col-span-2 lg:col-span-1 glow-gold' : ''}`}
+                                    className={`relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-accent/20 ${kpi.hero ? 'col-span-2 lg:col-span-1 glow-accent' : ''}`}
                                 >
                                     <div className="absolute top-0 right-0 w-12 h-12 rounded-bl-full" style={{ background: `${kpi.accent}09` }} />
-                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-white/[0.06]" style={{ background: `${kpi.accent}12` }}>
+                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-foreground/[0.06]" style={{ background: `${kpi.accent}12` }}>
                                         <Icon size={15} className={kpi.color} />
                                     </div>
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
@@ -601,10 +601,10 @@ export default function Dashboard() {
                             const Icon = kpi.icon;
                             return (
                                 <motion.div key={kpi.label} variants={fadeUp}
-                                    className="relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-gold/20"
+                                    className="relative overflow-hidden rounded-2xl border border-card-border bg-card-bg p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-accent/20"
                                 >
                                     <div className="absolute top-0 right-0 w-12 h-12 rounded-bl-full" style={{ background: `${kpi.accent}09` }} />
-                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-white/[0.06]" style={{ background: `${kpi.accent}12` }}>
+                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3 border border-foreground/[0.06]" style={{ background: `${kpi.accent}12` }}>
                                         <Icon size={16} className={kpi.color} />
                                     </div>
                                     <p className="text-[9px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-1">{kpi.label}</p>
@@ -631,7 +631,7 @@ export default function Dashboard() {
                 {isAdmin && (
                     <div className="space-y-5 pt-2">
                         <h2 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
-                            <BarChart3 size={15} className="text-brand-gold" /> Financial Intelligence & Analytics
+                            <BarChart3 size={15} className="text-brand-accent" /> Financial Intelligence & Analytics
                         </h2>
 
                         <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden shadow-xl">
@@ -688,9 +688,9 @@ export default function Dashboard() {
                                             const capitalPercentage = Number((distribution.percentage * 100).toFixed(2));
                                             const isPos = profitAmount >= 0;
                                             return (
-                                                <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-gold/20 transition-colors group">
+                                                <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-background border border-card-border hover:border-brand-accent/20 transition-colors group">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center font-black text-brand-gold text-sm group-hover:bg-brand-gold group-hover:text-black transition-all flex-shrink-0">
+                                                        <div className="w-9 h-9 rounded-xl bg-brand-accent/10 border border-brand-accent/15 flex items-center justify-center font-black text-brand-accent text-sm group-hover:bg-brand-accent group-hover:text-background transition-all flex-shrink-0">
                                                             {member.name ? member.name.charAt(0).toUpperCase() : '?'}
                                                         </div>
                                                         <div>
@@ -721,7 +721,7 @@ export default function Dashboard() {
 
                         <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
                             <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                                <FolderKanban size={14} className="text-brand-gold/60" />
+                                <FolderKanban size={14} className="text-brand-accent/60" />
                                 <div>
                                     <h3 className="text-sm font-black text-foreground tracking-tight">Recent Projects</h3>
                                     <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.projects) ? data.projects.length : 0} total</p>
@@ -734,7 +734,7 @@ export default function Dashboard() {
 
                         <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
                             <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                                <Lightbulb size={14} className="text-brand-gold/60" />
+                                <Lightbulb size={14} className="text-brand-accent/60" />
                                 <div>
                                     <h3 className="text-sm font-black text-foreground tracking-tight">Ideas</h3>
                                     <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">{Array.isArray(data.ideas) ? data.ideas.length : 0} concepts</p>
@@ -747,7 +747,7 @@ export default function Dashboard() {
 
                         <motion.div variants={fadeUp} className="bg-card-bg rounded-3xl border border-card-border overflow-hidden">
                             <div className="px-5 pt-5 pb-4 border-b border-card-border flex items-center gap-2">
-                                <CheckSquare size={14} className="text-brand-gold/60" />
+                                <CheckSquare size={14} className="text-brand-accent/60" />
                                 <div>
                                     <h3 className="text-sm font-black text-foreground tracking-tight">Gear Checklist</h3>
                                     <p className="text-[9px] font-black text-foreground/25 uppercase tracking-widest mt-0.5">Equipment readiness</p>
